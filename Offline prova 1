@@ -1,0 +1,151 @@
+"""
+Codice per tdEIT offline da raw data (16 electrodes, 208 measurements)
+"""
+from __future__ import division, absolute_import, print_function
+import logging
+import itertools
+import time
+import threading
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from pyeit import mesh 
+from pyeit.eit.utils import eit_scan_lines
+import pyeit.eit.protocol as protocol
+from pyeit.eit.bp import BP as bp
+from pyeit.eit.fem import Forward
+
+logger = logging.getLogger(__name__)
+
+
+#def update_reference(self,data):
+#    baseline_flag = 1
+
+def eit_reconstruction(data):
+    """bp.py in reconstruction
+    Reconstruct an image from the measurements given by `data`.
+    """
+    # setup EIT scan conditions
+    img = []
+    baseline_flag = 1
+    n_el = 16 # number of electrodes. 
+    step = 1 
+    el_dist = int(n_el/2) # random initialize number 
+
+    # we create this according to an opposition protocol to maximize contrast. 
+    ex_mat = eit_scan_lines(n_el =n_el, dist =el_dist)
+    """ 0. construct mesh """
+    # h0 is initial mesh size. , h0=0.1
+    mesh_obj, el_pos = mesh.create(n_el)
+    """ 3. Set Up BP """
+    eit =  bp(mesh_obj,el_pos, ex_mat=ex_mat, step=step, parser='std')
+
+    eit.setup(weight='none')
+
+    try: 
+        if baseline_flag == 1:
+            f0 = np.array(data)
+            baseline_flag = 0 
+        # data contains fl.v and f0.v 
+        f1 = np.array(data)
+        # if the jacobian is not normalized, data may not to be normalized too.
+        ds_bp = eit.solve(f1, f0, normalize=True)
+        img = np.real(ds_bp)
+
+    except RuntimeError as err:
+        logger.error('reconstruction problem: %s', err)
+
+    return img
+
+def parse_line(line):
+    try:
+        _, data = line.split(";", 1)
+    except ValueError:
+        return None
+    items = []
+    for item in data.split(";"):
+        item = item.strip()
+        if not item:
+            continue
+        try:
+            items.append(float(item))
+        except ValueError:
+            return None
+    return np.array(items)
+
+n_el = 32
+""" Load Data: select a file you have created by simdata.py, or recorded through the dashboard """
+text_file = open("rawdata.csv", "r")
+lines       = text_file.readlines()
+print ("length lines: ",len(lines))
+# This is the baseline image.
+f0= parse_line(lines[0])
+# this is the new difference image. 
+f1= parse_line(lines[1])
+
+
+data_baseline = f0
+print ('f0',len(f0),len(f1))
+#g.update_reference(data_baseline)
+# set the baseline. 
+
+#baseline = eit_reconstruction(f0)
+# do the reconstruction. 
+#difference_image = eit_reconstruction(f1)
+#print (difference_image)
+# #print(g.__dict__)
+
+img = []
+baseline_flag = 1
+n_el = 16 # number of electrodes. 
+step = 1 
+el_dist = int(n_el/2) # random initialize number 
+
+# we create this according to an opposition protocol to maximize contrast. 
+ex_mat = eit_scan_lines(n_el =n_el, dist =el_dist)
+""" 0. construct mesh """
+# h0 is initial mesh size. , h0=0.1
+mesh_obj= mesh.create(n_el)
+el_pos = mesh_obj.el_pos
+protocol_obj = protocol.create(n_el, dist_exc=1, step_meas=1, parser_meas="std")
+
+# Define electrode current sink and current source
+#ex_line = protocol_obj.ex_mat[0].ravel()
+
+""" 3. Set Up BP """
+eit =  bp(mesh_obj, protocol_obj)
+#        self.eit =  bp(self.mesh_obj,self.el_pos, ex_mat=self.ex_mat, step=self.step, parser='std')
+
+eit.setup(weight='none')
+
+ds_bp = eit.solve(f1, f0, normalize=True)
+difference_image= np.real(ds_bp)
+
+
+pts     = mesh_obj.node
+tri = mesh_obj.element
+x   = pts[:, 0]
+y   = pts[:, 1]
+
+fig, ax = plt.subplots(figsize=(6, 4))
+im = ax.tripcolor(x,y, tri, difference_image,
+                  shading='flat', cmap=plt.cm.gnuplot)
+ax.plot(x[el_pos], y[el_pos], 'ro')
+for i, e in enumerate(el_pos):
+    ax.text(x[e], y[e], str(i+1), size=12)
+ax.axis('equal')
+fig.colorbar(im)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,22 @@
+GUI: attivare la connessione bluetooth
+ricevere dati
+tdEIT o fEIT? check box
+2D o 3D? check box
+scelta dell'algoritmo da usare-->menu a tendina: algoritmo, num elettrodi, protocollo
+input numero di elettrodi, protocollo acquisizione
+salvare in file txt e analizzare dati acquisiti precedenza
+
+funzioni: self.new_file ->upload nuovo file
+self.transmit->attiva la trasmissione con bluetooth
+self.clear_data ->pulisci output
+self.send_parameters
+self.import_file
+self.export_file
+self.check_index_protocol (FS)
+
+...
+self.reset_GUI
+
+
+acc_data_txt -> data_txt
+select mod1, mod2->check bx->tdEIT, fEIT

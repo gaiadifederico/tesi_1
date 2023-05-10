@@ -13,65 +13,91 @@ from pyqtgraph import PlotWidget
 from scipy.signal import butter, lfilter, freqs, find_peaks, hilbert, chirp
 import math
 from sklearn.preprocessing import StandardScaler
-logging.basicConfig(format="%(message)s", level=logging.INFO)
 import os
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThreadPool, QRunnable, pyqtSlot,QSize, QRect, QTimer,QDateTime
 from PyQt5.QtWidgets import (
-    QApplication, QLabel,QStyle,QTextEdit,QMainWindow,QPushButton,QVBoxLayout,QWidget,QHBoxLayout,QComboBox,QHBoxLayout,QTabWidget,QCheckBox, QMessageBox, QLineEdit, QFileDialog,QSpinBox
+    QApplication, QLabel,QStyle,QTextEdit,QMainWindow,QPushButton,QVBoxLayout,QWidget,QHBoxLayout,QComboBox,QHBoxLayout,QTabWidget,QCheckBox, QMessageBox, QLineEdit, QFileDialog,QSpinBox,QButtonGroup,QAbstractButton
 )
 
 #VARIABILI GLOBALI
-
-
-
-
 CONN_STATUS =False #stato connessione porta
 RX_DATA = False #stato ricezione dati
 PORTA_SERIALE = 0
 PAR_ARDUINO = False
+logging.basicConfig(format="%(message)s", level=logging.INFO)
 
-'''Parallel thread to check the connection state of the COM port'''
+######################### 
+# SERIAL_WORKER_SIGNALS #
+#########################
 class SerialWorkerSignals(QObject):
+    """!
+    @brief Class that defines the signals available to a serialworker.
+
+    Available signals (with respective inputs) are:
+        - device_port (classe): 
+            str --> port name to which a device is connected
+        - status:
+            str --> port name
+            int --> macro representing the state (0 - error during opening, 1 - success)
+    """
     device_port = pyqtSignal(str)
-    status =pyqtSignal(str, int)
-    setup = pyqtSignal(np.ndarray)
+    status = pyqtSignal(str, int)
 
+
+################# 
+# SERIAL_WORKER #
+#################
 class SerialWorker(QRunnable):
-
+    """!
+    @brief Main class for serial communication: handles connection with device.
+    """
     def __init__(self, serial_port_name):
+        """!
+        @brief Init worker.
+        """
         self.is_killed = False 
         super().__init__()
-        port =serial.Serial()
+        self.port = serial.Serial()
         self.port_name = serial_port_name
-        self.baudrate = 9600
-        self.signals =SerialWorkerSignals() 
+        self.baudrate = 9600 # hard coded but can be a global variable, or an input param
+        self.signals = SerialWorkerSignals()
+
+    @pyqtSlot()
     def run(self):
+        """!
+        @brief Estabilish connection with desired serial port.
+        """
         global CONN_STATUS
-        global PORTA_SERIALE
+
         if not CONN_STATUS:
             try:
-                self.port = serial.Serial (port=self.port_name, baudrate = self.baudrate, write_timeout = 0, timeout =2)
+                self.port = serial.Serial(port=self.port_name, baudrate=self.baudrate,
+                                        write_timeout=0, timeout=2)                
                 if self.port.is_open:
-                    self.port.write(b'o')
-                    time.sleep(1)
-                    if self.port.in_waiting>1:
-                        if self.port.read(1)==(b'z'):
-                            PORTA_SERIALE = self.port
-                            CONN_STATUS =True
-                            self.signals.status.emit(self.port_name,1)
-                            setup = PORTA_SERIALE.read(2)
-                            setup = struct.unpack('2B',setup)
-                            setup = np.asarray(setup,dtype=np.uint8)
-                            self.signals.setup.emit(setup)
-                            PORTA_SERIALE.flushInput()
-                    else:
-                        self.signals.status.emit(self.port_name, 0)
+                    CONN_STATUS = True
+                    self.signals.status.emit(self.port_name, 1)
+                    logging.info("Connected with port {}.".format(self.port_name))
+                    time.sleep(0.01)     
+            
             except serial.SerialException:
-                logging.info ("Error in connection with port {}.".format(self.port_name))
+                logging.info("Error with port {}.".format(self.port_name))
+                #emetto il segnale status --> dal thread parallelo a quello principale                
                 self.signals.status.emit(self.port_name, 0)
                 time.sleep(0.01)
 
+    @pyqtSlot()
+    def send(self, char):
+        """!
+        @brief Basic function to send a single char on serial port.
+        """
+        try:
+            self.port.write(char.encode('utf-8'))
+            logging.info("Written {} on port {}.".format(char, self.port_name))
+        except:
+            logging.info("Could not write {} on port {}.".format(char, self.port_name))
+
+    @pyqtSlot()
     def killed(self):
         global CONN_STATUS
         if self.is_killed and CONN_STATUS:
@@ -136,9 +162,9 @@ class Window(QMainWindow):
 
         self.send_parameters_btn = QPushButton(
             text = ("Confirm Parameters"),
-            #clicked = self.send_parameters
+            clicked = self.confirm_parameters
         )
-        self.send_parameters_btn.setFixedSize(500,100)
+        self.send_parameters_btn.setFixedSize(500,80)
         #self.send_parameters_btn.setIcon(QtGui.QIcon('check.png'))
         #self.send_parameters_btn.setIconSize(QSize(70,70))
 
@@ -166,11 +192,11 @@ class Window(QMainWindow):
         self.layout_port = QVBoxLayout()
         self.layout_port1 = QVBoxLayout()
         self.label_port = QLabel()
-        self.label_port.setText("Please connect your device:")
-        self.label_port.setStyleSheet("font-size: 15pt;")
-        self.layout_port.addWidget(self.label_port, alignment = Qt.AlignCenter)
-        self.layout_port.addWidget(self.com_list_widget, alignment = Qt.AlignCenter)
-        self.layout_port.addWidget(self.conn_btn, alignment = Qt.AlignCenter)
+        #self.label_port.setText("Please connect your device:")
+        #self.label_port.setStyleSheet("font-size: 15pt;")
+        #self.layout_port.addWidget(self.label_port)
+        self.layout_port.addWidget(self.com_list_widget)
+        self.layout_port.addWidget(self.conn_btn)
         #self.layout_port1.addWidget(self.image_logo, alignment = Qt.AlignHCenter)
         self.layout_port1.addLayout(self.layout_port)
         self.conn_btn.setStyleSheet("background-color: rgb(153,204,255)")
@@ -205,22 +231,25 @@ class Window(QMainWindow):
         self.widget_rx = QWidget()
         self.widget_rx.setLayout(self.layout_rx)
 
-        #Layout MODALITY AND PARAMETERS SELECTION TAB: acquisition protocol, number electrodes, algorithm to use
+        #Layout MODALITY AND PARAMETERS SELECTION TAB: acquisition protocol, number electrodes, algorithm to use, time acquisition, 2D vs 3D, fdEIT vs tdEIT
+        #protocollo
         self.box_protocol= QComboBox()
         self.box_protocol.addItems(["Adjacent", "Polar", "Zig-Zag"])    
         self.box_protocol.activated.connect(self.check_index_protocol)
-        self.box_protocol.setFixedSize(100,50)
+        #self.box_protocol.setFixedSize(100,50)
 
+        #n_el
         self.box_electrodes = QComboBox()
-        self.box_electrodes.addItems(["8", "16", "32"])   
-        self.box_electrodes.setFixedSize(100,50) 
+        self.box_electrodes.addItems(["8", "16", "32", "64"])   
+        #self.box_electrodes.setFixedSize(100,50) 
         self.box_electrodes.activated.connect(self.check_index_electrodes)
 
+        #acquisition time
         self.spin_minutes = QSpinBox(self)
         self.spin_minutes.setRange(1, 59)
         self.spin_minutes.lineEdit().setReadOnly(True)
         self.spin_minutes.setSizeIncrement(1,1)
-        self.spin_minutes.setFixedSize(100,50)
+        #self.spin_minutes.setFixedSize(100,50)
         self.spin_minutes.setSuffix(" min")
         self.spin_minutes.valueChanged.connect(self.update_time)
 
@@ -228,12 +257,43 @@ class Window(QMainWindow):
         self.electrode_label = QLabel()
         self.min_label = QLabel()
         self.protocol_label.setText("Select Acquisition Protocol:")
-        self.protocol_label.setFixedSize(200,50)
-        self.electrode_label.setFixedSize(200,50)
+        #self.protocol_label.setFixedSize(200,50)
+        #self.electrode_label.setFixedSize(200,50)
         self.electrode_label.setText("Select Number Electrodes:")
-        self.min_label.setFixedSize(200,50)
+        #self.min_label.setFixedSize(200,50)
         self.min_label.setText("Acquisition time:")
 
+
+        self.layout_botton_1 = QHBoxLayout()
+        self.b1 = QCheckBox("2D")
+        self.b1.setChecked(True)
+        self.b1.stateChanged.connect(lambda:self.btnstate(self.b1))
+        self.layout_botton_1.addWidget(self.b1)
+        self.b2 = QCheckBox("3D")
+        self.b2.toggled.connect(lambda:self.btnstate(self.b2))
+        self.layout_botton_1.addWidget(self.b2)
+        self.bg = QButtonGroup()
+        self.bg.addButton(self.b1,1)
+        self.bg.addButton(self.b2,2)
+        self.bg.buttonClicked[QAbstractButton].connect(self.btngroup)
+
+        self.layout_botton_2 = QHBoxLayout()
+        self.b3 = QCheckBox("fEIT")
+        self.b3.setChecked(True)
+        self.b3.stateChanged.connect(lambda:self.btnstate(self.b3))
+        self.layout_botton_2.addWidget(self.b3)
+        self.b4 = QCheckBox("tdEIT")
+        self.b4.toggled.connect(lambda:self.btnstate(self.b4))
+        self.layout_botton_2.addWidget(self.b4)
+        self.bg1 = QButtonGroup()
+        self.bg1.addButton(self.b3,1)
+        self.bg1.addButton(self.b4,2)
+        self.bg1.buttonClicked[QAbstractButton].connect(self.btngroup)
+
+        self.layout_parameters_bg=QVBoxLayout()
+        self.layout_parameters_bg.addLayout(self.layout_botton_1)
+        self.layout_parameters_bg.addLayout(self.layout_botton_2)
+                
         self.layout_parameters_protocol_box = QHBoxLayout()
         self.layout_parameters_protocol_box.addWidget(self.protocol_label)
         self.layout_parameters_protocol_box.addWidget(self.box_protocol)
@@ -249,6 +309,7 @@ class Window(QMainWindow):
 
         self.layout_parameters = QVBoxLayout()
         #self.layout_parameters.addWidget(self.setting_exp_checkbox,alignment=Qt.AlignCenter )
+        self.layout_parameters.addLayout(self.layout_parameters_bg)
         self.layout_parameters.addLayout(self.layout_parameters_protocol_box)
         self.layout_parameters.addLayout(self.layout_parameters_electr_box)
         self.layout_parameters.addLayout(self.layout_parameters_time_min)
@@ -257,7 +318,7 @@ class Window(QMainWindow):
 
         self.layout_settings_main = QVBoxLayout()
         self.widget_settings_main = QWidget()
-        self.widget_settings_main.setLayout(self.layout_settings_main)
+        self.widget_settings_main.setLayout(self.layout_parameters)
         self.protocol=0
         self.electrodes=0
         self.modality=0 
@@ -298,6 +359,23 @@ class Window(QMainWindow):
         #self.tabs.setTabEnabled(4,False)
         #self.tabs.setTabEnabled(5,False)
     
+    #FUNZIONE CHECK BOTTONI
+    def btnstate(self,b):
+        if b.isChecked() == True:
+            if b.text()=="2D": 
+                self.dimension=0 #2D acquisition
+                print("2D acquisition mode")
+            elif b.text()=="3D": 
+                self.dimension=1 #3D acquisition
+                print("3D acquisition mode")
+            elif b.text()=="fEIT":
+                self.eit_modality=0
+            elif b.text()=="tdEIT":
+                self.eit_modality=1
+
+    def btngroup(self,btn):
+        print (btn.text() +" is selected")
+
     #FUNZIONI PER IMPORT/EXPORT FILE
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -366,14 +444,14 @@ class Window(QMainWindow):
         global SETTINGS
         global PORTA_SERIALE
         SETTINGS=1
-        self.tabs.setTabEnabled(3,True)
+        #self.tabs.setTabEnabled(3,True)
         self.max_time_acquisition = self.spin_minutes.value()*60
-        byte_parametri = ((self.protocol<<4)|(self.electrodes)) #da far interpretare firmware
-        PORTA_SERIALE.write(b'a') 
-        PORTA_SERIALE.write(struct.pack('<H', byte_parametri)) 
+        #byte_parametri = ((self.protocol<<4)|(self.electrodes)) #da far interpretare firmware
+        #PORTA_SERIALE.write(b'a') 
+        #PORTA_SERIALE.write(struct.pack('<H', byte_parametri)) 
 
     def update_time(self):
-        self.max_time_acquisition = self.spin_mod_minutes.value()*60        
+        self.max_time_acquisition = self.spin_minutes.value()*60        
 
     def clear_data(self):
         self.TestoRX.clear()
@@ -384,7 +462,7 @@ class Window(QMainWindow):
     def serialscan(self):
         self.port_text = ""
         self.com_list_widget = QComboBox()
-        self.com_list_widget.setFixedSize(400,100)
+        #self.com_list_widget.setFixedSize(400,100)
         self.com_list_widget.currentTextChanged.connect(self.port_changed)
 
         self.conn_btn =QPushButton(
@@ -393,9 +471,9 @@ class Window(QMainWindow):
             toggled = self.on_toggle
         )
         
-        self.conn_btn.setFixedSize(400,100)
-        self.conn_btn.setIcon(QtGui.QIcon('link.png'))
-        self.conn_btn.setIconSize(QSize(40, 40))
+        #self.conn_btn.setFixedSize(400,100)
+        #self.conn_btn.setIcon(QtGui.QIcon('link.png'))
+        #self.conn_btn.setIconSize(QSize(40, 40))
         serial_port = [
             p.name
             for p in serial.tools.list_ports.comports()
@@ -426,30 +504,31 @@ class Window(QMainWindow):
         else:
             self.conn_btn.setStyleSheet("background-color: rgb(153,204,255)")
             self.conn_btn.setChecked(False)
-            self.tabs.setCurrentIndex(0)
-            self.tabs.setTabEnabled(1,True)
-            self.tabs.setTabEnabled(2,False)
-            self.tabs.setTabEnabled(3,False)
-            self.tabs.setTabEnabled(4,False)
+            #self.tabs.setCurrentIndex(0)
+            #self.tabs.setTabEnabled(1,True)
+            #self.tabs.setTabEnabled(2,False)
+            #self.tabs.setTabEnabled(3,False)
+            #self.tabs.setTabEnabled(4,False)
 
-            self.transmit_btn.setText("START Transmission")
-            self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
+            #self.transmit_btn.setText("START Transmission")
+            #self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
-            self.timer.stop()
-            self.timer_acquisition.stop()
+            #self.timer.stop()
+            #self.timer_acquisition.stop()
             RX_DATA = False
             self.com_list_widget.show()
-            self.acquisition_time = 0
-            self.text_time.setText("00:00")
+            #self.acquisition_time = 0
+            #self.text_time.setText("00:00")
             #self.statistics_btn.setEnabled(True) 
             #self.new_acquisition_btn.setEnabled(False)
             #self.new_acquisition_btn_rx.setEnabled(False)
-            if PORTA_SERIALE!=0:    
-                PORTA_SERIALE.write(b't')
+            #stop the transmission
+            #if PORTA_SERIALE!=0:    
+                #PORTA_SERIALE.write(b't')
+            
             time.sleep(0.1)
 
             # kill thread
-            RX_DATA = False
             self.serial_worker.is_killed = True
             self.serial_worker.killed()
             self.com_list_widget.setDisabled(False) # enable the possibility to change port
@@ -489,11 +568,9 @@ class Window(QMainWindow):
 
         if checked:
             self.transmit_btn.setText("STOP Transmission")
-            self.transmit_btn.setStyleSheet("background-color: rgb(255,51,51);")
-            self.transmit_btn.setIcon(QtGui.QIcon('bluetooth.png'))
-            if self.finished==False and self.message_value == QMessageBox.Yes:
-                self.start_transmission()
-            elif self.message_value==False:
+            #self.transmit_btn.setStyleSheet("background-color: rgb(255,51,51);")
+            #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth.png'))
+            if self.finished==False:
                 self.start_transmission()
             
         else:
@@ -534,10 +611,13 @@ class Window(QMainWindow):
         global RX_DATA
         global PORTA_SERIALE
         self.export_file_btn.setEnabled(True) 
-        PORTA_SERIALE.write(b'b')
+        if(self.eit_modality==0):
+            PORTA_SERIALE.write(b'a') #'a' interpretata da arduino come fEIT
+        else:
+            PORTA_SERIALE.write(b'b') #'b' interpretata da arduino come tdEIT
         #time.sleep(1)
         RX_DATA = True
-        #Start il thread
+        #Start the thread for the reception of data from arduino
         #self.rx_worker = WorkerRXCOM() #prima dichiaro rx_worker e subito dopo connetto i segnali
         #self.threadpool.start(self.rx_worker) #start threadpool
         #self.rx_worker.signals.dati_accelerazione.connect(self.display_raw_data)
@@ -550,7 +630,6 @@ class Window(QMainWindow):
         print(self.time_stamp)
         self.num = 0
         self.minutes = 0
-
         #self.statistics_btn.setEnabled(False) #disabilito il pulsante che verrà abilitato una volta conclusa la trasmissione
         #self.new_acquisition_btn_rx.setEnabled(False)
         #self.new_acquisition_btn.setEnabled(False)

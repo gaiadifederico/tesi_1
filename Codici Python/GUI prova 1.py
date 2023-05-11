@@ -581,13 +581,10 @@ class Window(QMainWindow):
     def stop_transmission(self):
         self.transmit_btn.setText("START Transmission")
         self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
-        self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
+        #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
         self.timer.stop()
         self.timer_acquisition.stop()
-        if(self.acquisition_time<60):
-            print("Numero di campioni insufficiente per il processing")
-            self.export_file_btn.setEnabled(False)
-        PORTA_SERIALE.write(b's')
+        #PORTA_SERIALE.write(b's')
         RX_DATA = False
         self.com_list_widget.show()
         #self.statistics_btn.setEnabled(True)

@@ -1,0 +1,43 @@
+Digital ground connesso a analog ground->induttanza? per disaccoppiare
+Pensare scaletta della prossima presentazione
+collegare GUI e bluetooth, imbastire collegamento e poi pensare alle funzioni che servono per settare i parametri
+esempio: provare a fare un frequency sweep tramite comandi dalla gui 
+usare interrupt per ricevere caratteri? 
+mandare carattere acquisizione quando fai "start transmission"
+self.dimension=0 2D, 1 3D
+self.eit_modality=0 fEIT, 1 tdEIT
+l'acquisizione viene fermata da arduino
+
+AD5933: supply 2.7V-5.5V, always use 10uF,0.1uF->10*10^6 pF, 100nF/100*10^3pF
+program: frequency sweep, starting point, ending point, frequency step
+         Vout-Vin amplitude of the sinusoidal signal to measure the unknown impedance
+Clock: internal oscillator or by the user through MCLK, status determined by Bit D3 in control register(0x81)
+frequency resolution: 24-bit word loaded over I2C to frequency increment register
+                       start frequency, increment frequency, number of increments
+start frequency: (f_start)*(2^27)/(MCLK/4) es. se f_start=30kHz, MCLK=16MHz, 0x0F5C28
+bit D3 status register is set when all frequency points are completed
+Output voltage peak-to-peak 0X80,0X81
+choose a RFB to maintain with the selected gain of PGA the signal in a linear range of ADC (0V to VDD)
+PGA: 1 to 5, bit D8 control register 0X80
+Result 16-bit registers, 1 for real and 1 for imaginary part, twos comlpement format
+internal clock 16.776MHz ->bit D3 control register, 0X81
+Calculate the gain factor by means of excitation signal range, current-to-voltage gain resistor, PGA gain
+for exaple if peal-to-peak voltage to ADC is 2V but PGAx5, saturation!
+real and imaginary components of the DFT, not of the impedance->Magnitude=sqr(R^2+I^2), Phase=atan(I/R) (attention to signs)
+Calibration: first step use a resistor to calibrate the system phase, compute the system phase
+second step: calculate the phase of any unknown impedance and recalculate the new phase
+
+
+
+Tesi Carpano: 1.98V output AD5933, offset removed but added from the difference amplifier 
+use the reference resistors to modulate the intensity of the current
+
+
+Arduino nano: 
+A4 SDA -> 15 SDA
+A5 SCL -> 16 SCL
+default (5V alimentation) 3V p-to-p (range 1), DC bias voltage 2.24V
+ref 10k RFB
+unknown impedance 560k
+
+arduino-ad5933 library: missing set excitation range, no calibration phase

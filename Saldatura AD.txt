@@ -1,8 +1,0 @@
-Digital ground connesso a analog ground->induttanza? per disaccoppiare
-Pensare scaletta della prossima presentazione
-collegare GUI e bluetooth, imbastire collegamento e poi pensare alle funzioni che servono per settare i parametri
-esempio: provare a fare un frequency sweep tramite comandi dalla gui 
-usare interrupt per ricevere caratteri? 
-mandare carattere acquisizione quando fai "start transmission"
-self.dimension=0 2D, 1 3D
-self.eit_modality=0 fEIT, 1 tdEIT

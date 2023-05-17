@@ -69,13 +69,14 @@ class SerialWorker(QRunnable):
         @brief Estabilish connection with desired serial port.
         """
         global CONN_STATUS
-
+        global PORTA_SERIALE
         if not CONN_STATUS:
             try:
                 self.port = serial.Serial(port=self.port_name, baudrate=self.baudrate,
                                         write_timeout=0, timeout=2)                
                 if self.port.is_open:
                     CONN_STATUS = True
+                    PORTA_SERIALE = self.port
                     self.signals.status.emit(self.port_name, 1)
                     logging.info("Connected with port {}.".format(self.port_name))
                     time.sleep(0.01)     
@@ -107,6 +108,9 @@ class SerialWorker(QRunnable):
             self.signals.device_port.emit(self.port_name)
             logging.info("Killing the process")
 
+
+
+
 '''MAIN WINDOW'''
 class Window(QMainWindow):  
       
@@ -126,8 +130,8 @@ class Window(QMainWindow):
     def setupUi(self):
         #GENERAL SETTINGS
         self.setStyleSheet("font-size: 14pt;")
-        self.setFont(QtGui.QFont("Calibri"))
-        #self.setWindowTitle("A2B. Acceleration to Breath")
+        self.setFont(QtGui.QFont("Arial"))
+        self.setWindowTitle("Wearable EIT")
         #self.setWindowIcon(QtGui.QIcon('logo.png'))
 
         #BUTTONS
@@ -136,7 +140,7 @@ class Window(QMainWindow):
             clicked=self.new_file
         )
         self.new_upload_btn.setStyleSheet("background-color: rgb(255,204,204);")
-        self.new_upload_btn.setFixedHeight(100)
+        #self.new_upload_btn.setFixedHeight(100)
 
         self.TestoRX = QTextEdit(self)
         self.TestoRX.setFixedHeight(700)
@@ -164,7 +168,7 @@ class Window(QMainWindow):
             text = ("Confirm Parameters"),
             clicked = self.confirm_parameters
         )
-        self.send_parameters_btn.setFixedSize(500,80)
+        #self.send_parameters_btn.setFixedSize(500,80)
         #self.send_parameters_btn.setIcon(QtGui.QIcon('check.png'))
         #self.send_parameters_btn.setIconSize(QSize(70,70))
 
@@ -175,7 +179,7 @@ class Window(QMainWindow):
         #self.import_file_btn.setStyleSheet("background-color: rgb(255,204,204);")
         #self.import_file_btn.setIcon(QtGui.QIcon('import.png'))
         #self.import_file_btn.setIconSize(QSize(150,150))
-        self.import_file_btn.setFixedSize(600,400)
+        #self.import_file_btn.setFixedSize(600,400)
 
         self.export_file_btn = QPushButton(
             text = "Export file",
@@ -184,25 +188,10 @@ class Window(QMainWindow):
         #self.export_file_btn.setStyleSheet("background-color: rgb(204,229,255);")
         #self.export_file_btn.setIcon(QtGui.QIcon('export.png'))
         #self.export_file_btn.setIconSize(QSize(150,150))
-        self.export_file_btn.setFixedSize(600,400)    
+        #self.export_file_btn.setFixedSize(600,400)    
 
 
         #LAYOUTS
-        #Layout HOME TAB
-        self.layout_port = QVBoxLayout()
-        self.layout_port1 = QVBoxLayout()
-        self.label_port = QLabel()
-        #self.label_port.setText("Please connect your device:")
-        #self.label_port.setStyleSheet("font-size: 15pt;")
-        #self.layout_port.addWidget(self.label_port)
-        self.layout_port.addWidget(self.com_list_widget)
-        self.layout_port.addWidget(self.conn_btn)
-        #self.layout_port1.addWidget(self.image_logo, alignment = Qt.AlignHCenter)
-        self.layout_port1.addLayout(self.layout_port)
-        self.conn_btn.setStyleSheet("background-color: rgb(153,204,255)")
-        self.widget_port = QWidget()
-        self.widget_port.setLayout(self.layout_port1)
-
         #Layout TRANSMISSION TAB
         self.layout_graph = QVBoxLayout()
         #self.layout_graph.addWidget(self.AccAxisPlotWidget)
@@ -318,24 +307,41 @@ class Window(QMainWindow):
 
         self.layout_settings_main = QVBoxLayout()
         self.widget_settings_main = QWidget()
-        self.widget_settings_main.setLayout(self.layout_parameters)
+        #self.widget_settings_main.setLayout(self.layout_parameters)
         self.protocol=0
         self.electrodes=0
         self.modality=0 
 
-        #Layout IMPORT EXPORT FILE
-        self.layout_import_file = QHBoxLayout()
-        self.label_import_file = QLabel("IMPORT FILE: Upload EIT data")
-        self.layout_import_file.addWidget(self.label_import_file)
-        self.layout_import_file.addWidget(self.import_file_btn, alignment=Qt.AlignLeft)
-        self.layout_export_file = QHBoxLayout()
-        self.layout_export_file_2 = QVBoxLayout()
-        self.label_export_file = QLabel("EXPORT FILE: Download EIT data")
-        self.layout_export_file_2.addWidget(self.label_export_file)
-        self.layout_export_file.addLayout(self.layout_export_file_2)
-        self.layout_export_file.addWidget(self.export_file_btn, alignment=Qt.AlignLeft)
+        #Layout HOME TAB
+        self.layout_port = QHBoxLayout()
+        self.layout_port1 = QVBoxLayout()
+        self.label_port = QLabel()
+        self.label_port.setText("Please connect your device:")
+        #self.label_port.setStyleSheet("font-size: 15pt;")
+        self.layout_port.addWidget(self.label_port)
+        self.layout_port.addWidget(self.com_list_widget)
+        self.layout_port.addWidget(self.conn_btn)
+        #self.layout_port1.addWidget(self.image_logo, alignment = Qt.AlignHCenter)
+        self.layout_port1.addLayout(self.layout_port)
+        self.layout_port1.addLayout(self.layout_parameters)
+        self.conn_btn.setStyleSheet("background-color: rgb(153,204,255)")
+        self.widget_port = QWidget()
+        self.widget_port.setLayout(self.layout_port1)
 
-        self.layout_file = QVBoxLayout()
+
+        #Layout IMPORT EXPORT FILE
+        self.layout_import_file = QVBoxLayout()
+        #self.label_import_file = QLabel("Upload EIT data")
+        #self.layout_import_file.addWidget(self.label_import_file)
+        self.layout_import_file.addWidget(self.import_file_btn)
+        self.layout_export_file = QVBoxLayout()
+        self.layout_export_file_2 = QVBoxLayout()
+        #self.label_export_file = QLabel("Download EIT data")
+        #self.layout_export_file_2.addWidget(self.label_export_file)
+        #self.layout_export_file.addLayout(self.layout_export_file_2)
+        self.layout_export_file.addWidget(self.export_file_btn)
+
+        self.layout_file = QHBoxLayout()
         self.layout_file.addLayout(self.layout_import_file)
         self.layout_file.addLayout(self.layout_export_file)
         self.export_file_btn.setEnabled(False)
@@ -346,10 +352,10 @@ class Window(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.North)
         self.tabs.setMovable(False)
-        self.tabs.addTab(self.widget_port,"Serial Port")
-        self.tabs.addTab(self.widget_file, "File")
-        self.tabs.addTab(self.widget_settings_main,"Settings")
-        self.tabs.addTab(self.widget_rx, "Trasmission")
+        self.tabs.addTab(self.widget_port,"CONNECTION")
+        self.tabs.addTab(self.widget_file, "DOWNLOAD/UPLOAD")
+        #self.tabs.addTab(self.widget_settings_main,"Settings")
+        self.tabs.addTab(self.widget_rx, "LIVE EIT")
         self.setCentralWidget(self.tabs)
         self.tabs.setCurrentIndex(0)
 
@@ -491,7 +497,7 @@ class Window(QMainWindow):
         """
         if checked:
             # setup reading worker
-            self.conn_btn.setStyleSheet("background-color: rgb(255,102,102)")
+            self.conn_btn.setStyleSheet("background-color: rgb(153,255,153)")
             self.serial_worker = SerialWorker(self.port_text) # needs to be re defined
             # connect worker signals to functions
             self.serial_worker.signals.status.connect(self.check_serialport_status)
@@ -570,8 +576,8 @@ class Window(QMainWindow):
             self.transmit_btn.setText("STOP Transmission")
             #self.transmit_btn.setStyleSheet("background-color: rgb(255,51,51);")
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth.png'))
-            if self.finished==False:
-                self.start_transmission()
+            #if self.finished==False:
+            self.start_transmission()
             
         else:
             self.transmit_btn.setText("START Transmission")
@@ -590,29 +596,18 @@ class Window(QMainWindow):
         #self.statistics_btn.setEnabled(True)
         #self.new_acquisition_btn_rx.setEnabled(True)
         #self.new_acquisition_btn.setEnabled(True)
-        
-    def stop_transmission(self):
-        self.transmit_btn.setText("START Transmission")
-        self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
-        #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
-        self.timer.stop()
-        self.timer_acquisition.stop()
-        PORTA_SERIALE.write(b's')
-        RX_DATA = False
-        self.com_list_widget.show()
-        #self.statistics_btn.setEnabled(True)
-        #self.new_acquisition_btn_rx.setEnabled(True)
-        #self.new_acquisition_btn.setEnabled(True)
 
     def start_transmission(self): 
         global RX_DATA
         global PORTA_SERIALE
         self.export_file_btn.setEnabled(True) 
-        if(self.eit_modality==0):
-            PORTA_SERIALE.write(b'a') #'a' interpretata da arduino come fEIT
-        else:
-            PORTA_SERIALE.write(b'b') #'b' interpretata da arduino come tdEIT
+        #if(self.eit_modality==0):
+        #    PORTA_SERIALE.write(b'f') #'a' interpretata da arduino come fEIT
+        #else:
+        #    PORTA_SERIALE.write(b't') #'b' interpretata da arduino come tdEIT
         #time.sleep(1)
+        PORTA_SERIALE.write(b'a')
+        time.sleep(10)
         RX_DATA = True
         #Start the thread for the reception of data from arduino
         #self.rx_worker = WorkerRXCOM() #prima dichiaro rx_worker e subito dopo connetto i segnali
@@ -622,15 +617,35 @@ class Window(QMainWindow):
         #
         #self.timer.start(int(self.time_interval)*1000)
         #self.timer_acquisition.start(1000)
-        now = QDateTime.currentDateTime()
-        self.time_stamp = now.toString("dd-MM-yyyy_HH-mm-ss")
-        print(self.time_stamp)
-        self.num = 0
-        self.minutes = 0
+        #now = QDateTime.currentDateTime()
+        #self.time_stamp = now.toString("dd-MM-yyyy_HH-mm-ss")
+        #print(self.time_stamp)
+        #self.num = 0
+        #self.minutes = 0
         #self.statistics_btn.setEnabled(False) #disabilito il pulsante che verrà abilitato una volta conclusa la trasmissione
         #self.new_acquisition_btn_rx.setEnabled(False)
         #self.new_acquisition_btn.setEnabled(False)
-        self.tabs.setTabEnabled(2,False)
+        #self.tabs.setTabEnabled(2,False)
+        #while RX_DATA:
+        #if PORTA_SERIALE.in_waiting>343 :
+        dataArray = PORTA_SERIALE.read(164)
+        dataArray = struct.unpack('164B',dataArray)
+        dataArray = np.asarray(dataArray,dtype=np.uint8)
+        lastIndex = len(dataArray)-1
+        #if dataArray[0]==10 and dataArray[lastIndex]==11: #10 = 0A, 11 = 0B
+        #imp_data=dataArray[1:171]
+        print("Bytes ricevuti: {}\nNumero bytes ricevuti: {}".format(dataArray, len(dataArray)))
+        #print(len(dataArray))
+        #RX_DATA=False
+        #else:
+        #    RX_DATA=False
+        #    print("Wrong header")
+        dataFloat = struct.unpack('41f',dataArray)
+        dataFloat = np.asarray(dataFloat)#,dtype=float)
+        print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
+        print("Finished!")
+
+
 
     def display_time(self):
             self.acquisition_time += 1 
@@ -669,9 +684,9 @@ class Window(QMainWindow):
             @brief Kill every possible running thread upon exiting application.
             """
             global PORTA_SERIALE
-            if(PORTA_SERIALE!=0 and PORTA_SERIALE.is_open):
-                PORTA_SERIALE.write(b't')
-                time.sleep(0.1)
+            #if(PORTA_SERIALE!=0 and PORTA_SERIALE.is_open):
+                #PORTA_SERIALE.write(b't')
+                #time.sleep(0.1)
             self.serial_worker.is_killed = True
             self.serial_worker.killed()
 

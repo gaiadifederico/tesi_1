@@ -1,0 +1,2 @@
+schematico con componenti though hole
+trovare componente sostitutivo?

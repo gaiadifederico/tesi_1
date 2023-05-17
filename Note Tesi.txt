@@ -41,3 +41,8 @@ ref 10k RFB
 unknown impedance 560k
 
 arduino-ad5933 library: missing set excitation range, no calibration phase
+
+
+
+Cose da fare: rifare schematico
+portare seriale nella gui

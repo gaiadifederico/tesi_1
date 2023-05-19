@@ -122,7 +122,7 @@ void frequencySweepEasy() {
         //Serial.println(impedance);
         byte *data_byte = (byte)impedance;
         for(b = 0; b < sizeof(impedance); b++){
-          //Serial.write(data_byte[b]);
+          Serial.write(data_byte[b]);
           count_b +=1;
           size_imp = b;
         }

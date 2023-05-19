@@ -19,6 +19,7 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThreadPool, QRunnable, pyqtSl
 from PyQt5.QtWidgets import (
     QApplication, QLabel,QStyle,QTextEdit,QMainWindow,QPushButton,QVBoxLayout,QWidget,QHBoxLayout,QComboBox,QHBoxLayout,QTabWidget,QCheckBox, QMessageBox, QLineEdit, QFileDialog,QSpinBox,QButtonGroup,QAbstractButton
 )
+from binary_fractions import TwosComplement
 
 #VARIABILI GLOBALI
 CONN_STATUS =False #stato connessione porta
@@ -607,7 +608,7 @@ class Window(QMainWindow):
         #    PORTA_SERIALE.write(b't') #'b' interpretata da arduino come tdEIT
         #time.sleep(1)
         PORTA_SERIALE.write(b'a')
-        time.sleep(10)
+        time.sleep(5)
         RX_DATA = True
         #Start the thread for the reception of data from arduino
         #self.rx_worker = WorkerRXCOM() #prima dichiaro rx_worker e subito dopo connetto i segnali
@@ -640,9 +641,21 @@ class Window(QMainWindow):
         #else:
         #    RX_DATA=False
         #    print("Wrong header")
-        dataFloat = struct.unpack('41f',dataArray)
-        dataFloat = np.asarray(dataFloat)#,dtype=float)
-        print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
+        #dataFloat = struct.unpack('41f',dataArray)
+        #dataFloat = np.asarray(dataFloat)#,dtype=float32)
+        #print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
+
+        #dataArray = dataArray.tolist()
+        #for x in dataArray,:
+        #    dataArray[x:x+4]
+        #dataFloat=TwosComplement.to_float(dataArray)   
+        #print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
+    
+        Data = np.full(41,0,dtype=np.float32)
+
+        for i in range(41):
+            Data[i] = (((dataArray[i*4] & 0xFF)<<24) | ((dataArray[i*4+1] & 0xFF)<<16)|((dataArray[i*4+2] & 0xFF)<<8)|((dataArray[i*4+3] & 0xFF)))
+        print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(Data, len(Data)))
         print("Finished!")
 
 

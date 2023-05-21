@@ -147,12 +147,12 @@ class Window(QMainWindow):
         self.TestoRX.setFixedHeight(700)
 
         self.transmit_btn = QPushButton(
-            text=("Start Transmission"), 
+            text=("Perform frequency sweep"), 
             checkable=True,
             toggled=self.transmit
         )
         #self.transmit_btn.setIconSize(QSize(70,70))
-        self.transmit_btn.setFixedHeight(100)
+        self.transmit_btn.setFixedHeight(50)
         self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
         #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
 
@@ -172,6 +172,7 @@ class Window(QMainWindow):
         #self.send_parameters_btn.setFixedSize(500,80)
         #self.send_parameters_btn.setIcon(QtGui.QIcon('check.png'))
         #self.send_parameters_btn.setIconSize(QSize(70,70))
+        self.send_parameters_btn.setEnabled(False)
 
         self.import_file_btn = QPushButton(
             text= "Import file",
@@ -210,12 +211,13 @@ class Window(QMainWindow):
         self.stringa = ""
         self.layout_rx1.addWidget(self.transmit_btn)
         #self.layout_rx1.addWidget(self.new_acquisition_btn_rx)
-        self.layout_rx1.addWidget(self.clear_text_btn)
+        #self.layout_rx1.addWidget(self.clear_text_btn)
         self.layout_rx3.addWidget(self.label_time, alignment=Qt.AlignRight)
-        self.layout_rx3.addWidget(self.text_time)
+        self.layout_rx3.addWidget(self.text_time)        
+        self.layout_rx2.addLayout(self.layout_rx1)
         self.layout_rx2.addWidget(self.TestoRX)
         self.layout_rx2.addLayout(self.layout_rx3)
-        self.layout_rx2.addLayout(self.layout_rx1)
+
         self.layout_rx.addLayout(self.layout_rx2) 
         self.layout_rx.addLayout(self.layout_graph) 
         self.widget_rx = QWidget()
@@ -226,6 +228,7 @@ class Window(QMainWindow):
         self.box_protocol= QComboBox()
         self.box_protocol.addItems(["Adjacent", "Polar", "Zig-Zag"])    
         self.box_protocol.activated.connect(self.check_index_protocol)
+        self.box_protocol.setEnabled(False)
         #self.box_protocol.setFixedSize(100,50)
 
         #n_el
@@ -233,6 +236,7 @@ class Window(QMainWindow):
         self.box_electrodes.addItems(["8", "16", "32", "64"])   
         #self.box_electrodes.setFixedSize(100,50) 
         self.box_electrodes.activated.connect(self.check_index_electrodes)
+        self.box_electrodes.setEnabled(False)
 
         #acquisition time
         self.spin_minutes = QSpinBox(self)
@@ -242,6 +246,7 @@ class Window(QMainWindow):
         #self.spin_minutes.setFixedSize(100,50)
         self.spin_minutes.setSuffix(" min")
         self.spin_minutes.valueChanged.connect(self.update_time)
+        self.spin_minutes.setEnabled(False)
 
         self.protocol_label = QLabel()
         self.electrode_label = QLabel()
@@ -266,6 +271,9 @@ class Window(QMainWindow):
         self.bg.addButton(self.b1,1)
         self.bg.addButton(self.b2,2)
         self.bg.buttonClicked[QAbstractButton].connect(self.btngroup)
+        self.b1.setEnabled(False)
+        self.b2.setEnabled(False)
+
 
         self.layout_botton_2 = QHBoxLayout()
         self.b3 = QCheckBox("fEIT")
@@ -279,6 +287,8 @@ class Window(QMainWindow):
         self.bg1.addButton(self.b3,1)
         self.bg1.addButton(self.b4,2)
         self.bg1.buttonClicked[QAbstractButton].connect(self.btngroup)
+        self.b3.setEnabled(False)
+        self.b4.setEnabled(False)
 
         self.layout_parameters_bg=QVBoxLayout()
         self.layout_parameters_bg.addLayout(self.layout_botton_1)
@@ -305,6 +315,7 @@ class Window(QMainWindow):
         self.layout_parameters.addLayout(self.layout_parameters_time_min)
         self.layout_parameters.addLayout(self.layout_parameters_time_sec)
         self.layout_parameters.addWidget(self.send_parameters_btn, alignment=Qt.AlignCenter)
+        self.layout_parameters.setEnabled(False)
 
         self.layout_settings_main = QVBoxLayout()
         self.widget_settings_main = QWidget()
@@ -348,6 +359,14 @@ class Window(QMainWindow):
         self.export_file_btn.setEnabled(False)
         self.widget_file = QWidget()
         self.widget_file.setLayout(self.layout_file)
+
+        #TIMER
+        #self.timer =  QTimer()
+        #self.timer.timeout.connect(self.breathing_online)      
+        self.timer_acquisition =  QTimer()
+        self.timer_acquisition.timeout.connect(self.display_time)  
+        self.max_time_acquisition=60
+        self.acquisition_time = 0
 
         #TABS LAYOUT
         self.tabs = QTabWidget()
@@ -507,6 +526,14 @@ class Window(QMainWindow):
             self.threadpool.start(self.serial_worker)
             #self.serial_worker.signals.setup.connect(self.print_EEPROM_setup)
             self.com_list_widget.setDisabled(True)
+            self.box_protocol.setEnabled(True)
+            self.box_electrodes.setEnabled(True)
+            self.spin_minutes.setEnabled(True)
+            self.b1.setEnabled(True)
+            self.b2.setEnabled(True)
+            self.b3.setEnabled(True)
+            self.b4.setEnabled(True)
+            self.send_parameters_btn.setEnabled(True)
 
         else:
             self.conn_btn.setStyleSheet("background-color: rgb(153,204,255)")
@@ -521,7 +548,7 @@ class Window(QMainWindow):
             #self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
             #self.timer.stop()
-            #self.timer_acquisition.stop()
+            self.timer_acquisition.stop()
             RX_DATA = False
             self.com_list_widget.show()
             #self.acquisition_time = 0
@@ -542,6 +569,14 @@ class Window(QMainWindow):
             self.conn_btn.setText(
                 "Connect to port {}".format(self.port_text)
             )
+            self.box_protocol.setEnabled(False)
+            self.box_electrodes.setEnabled(False)
+            self.spin_minutes.setEnabled(False)
+            self.b1.setEnabled(False)
+            self.b2.setEnabled(False)
+            self.b3.setEnabled(False)
+            self.b4.setEnabled(False)
+            self.send_parameters_btn.setEnabled(False)
             #self.reset_GUI()
             
     def check_serialport_status(self, port_name, status):
@@ -574,23 +609,28 @@ class Window(QMainWindow):
         """
 
         if checked:
-            self.transmit_btn.setText("STOP Transmission")
-            #self.transmit_btn.setStyleSheet("background-color: rgb(255,51,51);")
+            self.transmit_btn.setText("Stop Acquisition")
+            self.transmit_btn.setStyleSheet("background-color: rgb(255,51,51);")
+            self.layout_parameters.setEnabled(False)
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth.png'))
             #if self.finished==False:
             self.start_transmission()
             
         else:
-            self.transmit_btn.setText("START Transmission")
+            self.transmit_btn.setText("Perform frequency sweep")
             self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
+            self.layout_parameters.setEnabled(True)
+            self.timer_acquisition.stop()
+            self.text_time.setText("00:00")
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
 
     def stop_transmission(self):
-        self.transmit_btn.setText("START Transmission")
+        self.transmit_btn.setText("Perform frequency sweep")
         self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
         #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
-        self.timer.stop()
+        #self.timer.stop()
         self.timer_acquisition.stop()
+        self.text_time.setText("00:00")
         #PORTA_SERIALE.write(b's')
         RX_DATA = False
         self.com_list_widget.show()
@@ -607,8 +647,9 @@ class Window(QMainWindow):
         #else:
         #    PORTA_SERIALE.write(b't') #'b' interpretata da arduino come tdEIT
         #time.sleep(1)
+        self.timer_acquisition.start(1000)
         PORTA_SERIALE.write(b'a')
-        time.sleep(5)
+        time.sleep(1)
         RX_DATA = True
         #Start the thread for the reception of data from arduino
         #self.rx_worker = WorkerRXCOM() #prima dichiaro rx_worker e subito dopo connetto i segnali
@@ -617,7 +658,7 @@ class Window(QMainWindow):
         #self.rx_worker.signals.dati_accelerazione.connect(self.raw_data_plot)
         #
         #self.timer.start(int(self.time_interval)*1000)
-        #self.timer_acquisition.start(1000)
+        
         #now = QDateTime.currentDateTime()
         #self.time_stamp = now.toString("dd-MM-yyyy_HH-mm-ss")
         #print(self.time_stamp)
@@ -641,9 +682,9 @@ class Window(QMainWindow):
         #else:
         #    RX_DATA=False
         #    print("Wrong header")
-        #dataFloat = struct.unpack('41f',dataArray)
-        #dataFloat = np.asarray(dataFloat)#,dtype=float32)
-        #print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
+        dataFloat = struct.unpack('41f',dataArray)
+        dataFloat = np.asarray(dataFloat,dtype=np.float32)
+        stringa = "Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat))
 
         #dataArray = dataArray.tolist()
         #for x in dataArray,:
@@ -651,12 +692,14 @@ class Window(QMainWindow):
         #dataFloat=TwosComplement.to_float(dataArray)   
         #print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
     
-        Data = np.full(41,0,dtype=np.float32)
+        #Data = np.full(41,0,dtype=np.float32)
+        #for i in range(41):
+        #    Data[i] = (((dataArray[i*4] & 0xFF)<<24) | ((dataArray[i*4+1] & 0xFF)<<16)|((dataArray[i*4+2] & 0xFF)<<8)|((dataArray[i*4+3] & 0xFF)))
+        #stringa = "Dati ricevuti: {}\nNumero dati ricevuti: {}".format(Data, len(Data))
 
-        for i in range(41):
-            Data[i] = (((dataArray[i*4] & 0xFF)<<24) | ((dataArray[i*4+1] & 0xFF)<<16)|((dataArray[i*4+2] & 0xFF)<<8)|((dataArray[i*4+3] & 0xFF)))
-        print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(Data, len(Data)))
+        self.TestoRX.setText(stringa)
         print("Finished!")
+
 
 
 
@@ -690,6 +733,12 @@ class Window(QMainWindow):
         #self.tabs.setTabEnabled(5,False)
         #self.reset_GUI()
         self.tabs.setCurrentIndex(1)
+    
+    def display_time(self):
+            self.acquisition_time += 1 
+            minutes = int(self.acquisition_time/60)
+            seconds = int(self.acquisition_time%60)
+            self.text_time.setText("{:02d}:{:02d}".format(minutes, seconds))
 
 
     def ExitHandler(self):

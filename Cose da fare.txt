@@ -1,2 +1,5 @@
 schematico con componenti though hole
-trovare componente sostitutivo?
+mille fori con circuito saldato
+misure bioimpedenza (frutta/noi)
+GUI con bluetooth, mettere tutto sulla prima schermata, far vedere dati ricevuti
+presentazione per mercoledì 

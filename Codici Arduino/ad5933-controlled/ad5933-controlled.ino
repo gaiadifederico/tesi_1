@@ -8,8 +8,8 @@ ad5933-test
 
 #define START_FREQ  (80000)
 #define FREQ_INCR   (1000)
-#define NUM_INCR    (40)
-#define REF_RESIST  (10000)
+#define NUM_INCR    (20)
+#define REF_RESIST  (150)
 
 double gain[NUM_INCR+1];
 int phase[NUM_INCR+1];
@@ -51,7 +51,7 @@ void loop(void)
         
         frequencySweepEasy();
         
-        delay(5000);
+        //delay(5000);
         break;
       case 'b':
         Serial.println("Perform a RAW frequency sweep:");

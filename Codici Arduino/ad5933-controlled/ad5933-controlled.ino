@@ -6,10 +6,10 @@ ad5933-test
 #include <Wire.h>
 #include "AD5933.h"
 
-#define START_FREQ  (80000)
+#define START_FREQ  (20000)
 #define FREQ_INCR   (1000)
-#define NUM_INCR    (20)
-#define REF_RESIST  (150)
+#define NUM_INCR    (40)
+#define REF_RESIST  (10000)
 
 double gain[NUM_INCR+1];
 int phase[NUM_INCR+1];

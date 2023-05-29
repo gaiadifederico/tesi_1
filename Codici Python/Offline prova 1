@@ -27,7 +27,7 @@ def eit_reconstruction(data):
     # setup EIT scan conditions
     img = []
     baseline_flag = 1
-    n_el = 4 # number of electrodes. 
+    n_el = 8 # number of electrodes. 
     step = 1 
     el_dist = int(n_el/2) # random initialize number 
 
@@ -72,7 +72,7 @@ def parse_line(line):
             return None
     return np.array(items)
 
-n_el = 4
+n_el = 8
 """ Load Data: select a file you have created by simdata.py, or recorded through the dashboard """
 text_file = open("data.csv", "r")
 lines       = text_file.readlines()
@@ -82,9 +82,8 @@ print ("length lines: ",len(lines))
 # this is the new difference image. 
 #f1= parse_line(lines[1])
 
-f0=np.array([12091.71,10946.34, 10711.25, 12270.19])
-f1=np.array([13184.07, 10364.70, 10462.29, 11523.32])
-
+f0=np.array([10606.60,10000.00,10000.00,9632.42,9632.42,10056.02,9086.74,10606.60,8808.30,9632.42,9632.42,10000.00,9632.42,10000.00,11103.50,9086.74,8808.30,7851.36,10000.00,9632.42,10000.00,10000.00,9214.43,9086.74,11103.50,8485.28,9632.42,10000.00,9086.74,9086.74,8808.30,11103.50,8320.50,9086.74,9632.42,10606.60,10000.00,11766.97,10000.00,9632.42])
+f1=np.array([9330.53,10000.00,9617.69,10669.87,10000.00,11014.15,10669.87,10000.00,10669.87,9330.53,10669.87,10669.87,10000.00,9617.69,9118.45,10669.87,10000.00,9118.45,11929.28,9118.45,10000.00,10669.87,10000.00,9330.53,10000.00,10000.00,9118.45,10669.87,10000.00,10669.87,10669.87,10000.00,11295.41,10000.00,10000.00,10000.00,9617.69,11014.15,11014.15,10000.00])
 data_baseline = f0
 print ('f0',len(f0),len(f1))
 #g.update_reference(data_baseline)
@@ -98,7 +97,7 @@ print ('f0',len(f0),len(f1))
 
 img = []
 baseline_flag = 1
-n_el = 4 # number of electrodes. 
+n_el = 8 # number of electrodes. 
 step = 1 
 el_dist = int(n_el/2) # random initialize number 
 

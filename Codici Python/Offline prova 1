@@ -82,8 +82,8 @@ print ("length lines: ",len(lines))
 # this is the new difference image. 
 #f1= parse_line(lines[1])
 
-f0=np.array([10606.60,10000.00,10000.00,9632.42,9632.42,10056.02,9086.74,10606.60,8808.30,9632.42,9632.42,10000.00,9632.42,10000.00,11103.50,9086.74,8808.30,7851.36,10000.00,9632.42,10000.00,10000.00,9214.43,9086.74,11103.50,8485.28,9632.42,10000.00,9086.74,9086.74,8808.30,11103.50,8320.50,9086.74,9632.42,10606.60,10000.00,11766.97,10000.00,9632.42])
-f1=np.array([9330.53,10000.00,9617.69,10669.87,10000.00,11014.15,10669.87,10000.00,10669.87,9330.53,10669.87,10669.87,10000.00,9617.69,9118.45,10669.87,10000.00,9118.45,11929.28,9118.45,10000.00,10669.87,10000.00,9330.53,10000.00,10000.00,9118.45,10669.87,10000.00,10669.87,10669.87,10000.00,11295.41,10000.00,10000.00,10000.00,9617.69,11014.15,11014.15,10000.00])
+f0 = np.array([7786.21,9144.44,9144.44,10000.00,8809.09,9144.44,8414.45,8809.09,8414.45,9144.44,9144.44,9144.44,10000.00,10000.00,8809.09,9144.44,8414.45,9144.44,9144.44,10000.00,9144.44,8414.45,9144.44,8414.45,10000.00,9144.44,8414.45,9144.44,9144.44,9144.44,9144.44,10000.00,9144.44,10000.00,10000.00,9144.44,9144.44,9144.44,9144.44,10000.00])
+f1=np.array([8414.45,8414.45,9144.44,9144.44,10000.00,9144.44,8414.45,8809.09,9144.44,9144.44,9144.44,10000.00,9144.44,9144.44,8150.97,9144.44,10000.00,8809.09,9144.44,10000.00,9144.44,8809.09,9144.44,9144.44,8414.45,10000.00,8809.09,9144.44,9144.44,9144.44,9144.44,10000.00,9144.44,10000.00,9144.44,9144.44,10381.61,10000.00,9144.44,10000.00])
 data_baseline = f0
 print ('f0',len(f0),len(f1))
 #g.update_reference(data_baseline)
@@ -99,7 +99,7 @@ img = []
 baseline_flag = 1
 n_el = 8 # number of electrodes. 
 step = 1 
-el_dist = int(n_el/2) # random initialize number 
+el_dist = 1 # random initialize number 
 
 # we create this according to an opposition protocol to maximize contrast. 
 ex_mat = eit_scan_lines(n_el =n_el, dist =el_dist)
@@ -121,6 +121,11 @@ eit.setup(weight='none')
 ds_bp = eit.solve(f1, f0, normalize=True)
 difference_image= np.real(ds_bp)
 
+eit_2 = Forward(mesh_obj)
+ex_line = protocol_obj.ex_mat[0].ravel()
+f = eit_2.solve(ex_line)
+f = np.real(f)
+
 
 pts     = mesh_obj.node
 tri = mesh_obj.element
@@ -136,6 +141,19 @@ for i, e in enumerate(el_pos):
 ax.axis('equal')
 fig.colorbar(im)
 plt.show()
+
+fig, ax = plt.subplots(figsize=(6, 4))
+im = ax.tripcolor(x,y, tri, f,
+                  shading='flat', cmap=plt.cm.gnuplot)
+ax.plot(x[el_pos], y[el_pos], 'ro')
+for i, e in enumerate(el_pos):
+    ax.text(x[e], y[e], str(i+1), size=12)
+ax.axis('equal')
+fig.colorbar(im)
+plt.show()
+
+
+
 
 
 

@@ -1,0 +1,202 @@
+"""
+Codice per tdEIT offline da raw data (16 electrodes, 208 measurements)
+"""
+from __future__ import division, absolute_import, print_function
+import logging
+import itertools
+import time
+import threading
+import numpy as np
+import matplotlib.pyplot as plt
+from pyeit import mesh 
+from pyeit.eit.utils import eit_scan_lines
+import pyeit.eit.protocol as protocol
+from pyeit.eit.bp import BP as bp
+from pyeit.eit.fem import EITForward
+
+logger = logging.getLogger(__name__)
+
+
+#def update_reference(self,data):
+#    baseline_flag = 1
+
+def eit_reconstruction(data):
+    """bp.py in reconstruction
+    Reconstruct an image from the measurements given by `data`.
+    """
+    # setup EIT scan conditions
+    img = []
+    baseline_flag = 1
+    n_el = 8 # number of electrodes. 
+    step = 1 
+    el_dist = int(n_el/2) # random initialize number 
+
+    # we create this according to an opposition protocol to maximize contrast. 
+    ex_mat = eit_scan_lines(n_el =n_el, dist =el_dist)
+    """ 0. construct mesh """
+    # h0 is initial mesh size. , h0=0.1
+    mesh_obj, el_pos = mesh.create(n_el)
+    """ 3. Set Up BP """
+    eit =  bp(mesh_obj,el_pos, ex_mat=ex_mat, step=step, parser='std')
+
+    eit.setup(weight='none')
+
+    try: 
+        if baseline_flag == 1:
+            f0 = np.array(data)
+            baseline_flag = 0 
+        # data contains fl.v and f0.v 
+        f1 = np.array(data)
+        # if the jacobian is not normalized, data may not to be normalized too.
+        ds_bp = eit.solve(f1, f0, normalize=True)
+        img = np.real(ds_bp)
+
+    except RuntimeError as err:
+        logger.error('reconstruction problem: %s', err)
+
+    return img
+
+def parse_line(line):
+    try:
+        _, data = line.split(";", 1)
+    except ValueError:
+        return None
+    items = []
+    for item in data.split(";"):
+        item = item.strip()
+        if not item:
+            continue
+        try:
+            items.append(float(item))
+        except ValueError:
+            return None
+    return np.array(items)
+
+n_el = 8
+""" Load Data: select a file you have created by simdata.py, or recorded through the dashboard """
+text_file = open("data.csv", "r")
+lines       = text_file.readlines()
+print ("length lines: ",len(lines))
+# This is the baseline image.
+#f0= parse_line(lines[0])
+# this is the new difference image. 
+#f1= parse_line(lines[1])
+
+f0 = np.array([10469.00,10469.00,10469.00,10469.00,10469.00,10469.00,10469.00,10469.00,10469.00,10000.00,10469.00,10469.00,9686.88,10867.54,9686.88,10469.00,10469.00,10469.00,10469.00,9686.88,10000.00,10469.00,10469.00,10000.00,10000.00,10000.00,10867.54,10000.00,10000.00,10000.00,9686.88,9686.88,9686.88,9686.88,9686.88,9686.88,10867.54,10000.00,9686.88,10867.54])
+#f1 = np.array([9003.62,10469.00,10000.00,10469.00,10000.00,11368.61,10000.00,9686.88,9253.38,10469.00,10469.00,9686.88,9686.88,10000.00,9003.62,10000.00,9003.62,10867.54,10867.54,10469.00,9686.88,10867.54,10867.54,9686.88,10000.00,10000.00,10469.00,10469.00,10469.00,10469.00,10867.54,9686.88,9686.88,10469.00,10469.00,9686.88,10867.54,10867.54,9686.88,10867.54])
+#f2 = np.array([10000.00,9253.38,10867.54,10469.00,10469.00,9686.88,10867.54,10469.00,9686.88,10000.00,9686.88,10469.00,9253.38,10000.00,10000.00,9686.88,9686.88,9003.62,10000.00,9686.88,9686.88,9686.88,10000.00,10000.00,9686.88,9686.88,10469.00,9686.88,9686.88,10000.00,10867.54,10000.00,10469.00,9003.62,10867.54,10469.00,10000.00,10000.00,10867.54,8724.17])
+#f3 = np.array([10469.00,10867.54,10469.00,9686.88,9686.88,10469.00,9686.88,10000.00,10000.00,9253.38,9253.38,10469.00,9686.88,10867.54,10469.00,10000.00,9686.88,9253.38,9686.88,9686.88,9341.37,10867.54,10867.54,9686.88,10000.00,9686.88,10867.54,10469.00,10000.00,9686.88,9003.62,9686.88,9686.88,10469.00,9003.62,9686.88,10000.00,10469.00,9686.88,10000.00])
+#f4 = np.array([10000.00,9686.88,10000.00,10000.00,10469.00,9253.38,9686.88,9686.88,9686.88,10000.00,10000.00,9686.88,10000.00,10000.00,10000.00,9686.88,9686.88,10000.00,9686.88,10867.54,10000.00,9686.88,10867.54,9686.88,9253.38,10000.00,10867.54,10000.00,9686.88,9253.38,10469.00,9686.88,10000.00,9686.88,9686.88,10000.00,10000.00,10469.00,10000.00,10000.00])
+
+#f1 = np.array([9253.38,10867.54,10867.54,10867.54,10867.54,10867.54,11368.61,10000.00,10867.54,10867.54,10000.00,10000.00,9686.88,10867.54,10867.54,9686.88,9686.88,10000.00,9686.88,10000.00,10000.00,10000.00,10469.00,10000.00,10469.00,10469.00,10469.00,9686.88,10867.54,9686.88,10867.54,9253.38,9686.88,10469.00,10000.00,10000.00,10867.54,10469.00,10000.00,10469.00])
+#f2 = np.array([10469.00,10000.00,10867.54,10000.00,10000.00,10867.54,10469.00,10000.00,10867.54,10469.00,10000.00,9686.88,9686.88,9686.88,10867.54,10867.54,10867.54,10000.00,10000.00,10000.00,10867.54,10469.00,10469.00,10867.54,10000.00,10000.00,9686.88,9686.88,10469.00,9686.88,10469.00,10469.00,10469.00,10000.00,10867.54,10469.00,10469.00,10469.00,9341.37,10867.54])
+#f3 = np.array([10000.00,10469.00,10469.00,10000.00,10469.00,9686.88,10469.00,10000.00,10867.54,10469.00,10469.00,10469.00,10469.00,9686.88,10265.70,10000.00,10000.00,9003.62,10867.54,9686.88,9341.37,9686.88,10867.54,10000.00,10867.54,10469.00,10469.00,11884.32,10469.00,9686.88,10867.54,9686.88,10000.00,10000.00,10000.00,10867.54,10469.00,9686.88,10000.00,9686.88])
+#f4 = np.array([10469.00,10867.54,10000.00,10469.00,10867.54,9686.88,9686.88,10000.00,10867.54,10469.00,10867.54,10000.00,10867.54,10000.00,10469.00,9686.88,9686.88,10867.54,10867.54,10000.00,10000.00,10000.00,10000.00,10867.54,10469.00,9686.88,10867.54,10469.00,10000.00,10000.00,10867.54,10469.00,10000.00,10000.00,9686.88,10867.54,10867.54,10867.54,10469.00,10469.00])
+
+#f1 = np.array([11368.61,10469.00,10867.54,10469.00,10000.00,10000.00,10867.54,10867.54,10000.00,10867.54,10469.00,9686.88,9686.88,10867.54,10000.00,9686.88,9686.88,10469.00,10469.00,10867.54,9686.88,10469.00,10867.54,10867.54,10867.54,10000.00,10469.00,10469.00,9686.88,9686.88,10867.54,10469.00,9686.88,9686.88,9686.88,10469.00,10000.00,10469.00,10867.54,10000.00])
+#f2 = np.array([10867.54,10867.54,10867.54,10867.54,10867.54,10867.54,10867.54,10469.00,10000.00,10000.00,10867.54,10469.00,9686.88,10469.00,10867.54,10469.00,10469.00,10000.00,10867.54,10000.00,10469.00,10867.54,10867.54,9686.88,10867.54,10000.00,10867.54,10469.00,10867.54,10000.00,10000.00,10000.00,10000.00,10469.00,10469.00,10000.00,10000.00,9686.88,10469.00,10867.54])
+#f3 = np.array([10000.00,10469.00,10867.54,9686.88,10000.00,10469.00,10000.00,10867.54,10000.00,10000.00,9686.88,10867.54,9686.88,10469.00,10000.00,10000.00,10000.00,10469.00,10000.00,10867.54,9253.38,10469.00,10469.00,9686.88,10265.70,9686.88,9686.88,10469.00,10000.00,9686.88,10469.00,9686.88,10867.54,10000.00,10469.00,10000.00,10469.00,10867.54,10867.54,10469.00])
+#f4 = np.array([10867.54,10867.54,10469.00,10867.54,10000.00,10000.00,11884.32,10867.54,9686.88,10000.00,10867.54,9686.88,9686.88,10469.00,10469.00,10469.00,10000.00,9686.88,10469.00,9686.88,10000.00,10000.00,10000.00,10469.00,10000.00,10000.00,9686.88,10000.00,9686.88,9686.88,10469.00,10000.00,10469.00,9686.88,10000.00,10867.54,9686.88,10469.00,10469.00,9686.88])
+
+f1 = np.array([10000.00,10867.54,10000.00,9686.88,10469.00,10867.54,10469.00,10469.00,10867.54,10867.54,10469.00,10000.00,10000.00,9686.88,10469.00,10000.00,9686.88,10000.00,10867.54,10867.54,9253.38,10000.00,10000.00,10469.00,9686.88,10469.00,10469.00,10469.00,9686.88,9253.38,9686.88,10000.00,9686.88,9686.88,9686.88,10469.00,10867.54,10867.54,10867.54,10867.54])
+f2 = np.array([10469.00,10469.00,10867.54,9686.88,10000.00,10000.00,10000.00,10469.00,9686.88,9686.88,10000.00,10000.00,10867.54,10000.00,10867.54,10867.54,9686.88,10000.00,10867.54,10000.00,10000.00,10000.00,10867.54,9686.88,10469.00,9686.88,10000.00,9686.88,10469.00,9686.88,10867.54,10000.00,10867.54,9686.88,10469.00,10000.00,10000.00,10000.00,10867.54,9686.88])
+f3 = np.array([10469.00,10867.54,11368.61,10469.00,10469.00,10867.54,10000.00,10469.00,10469.00,10469.00,9253.38,9253.38,10000.00,10469.00,11884.32,10469.00,10469.00,10000.00,10469.00,10469.00,9686.88,10000.00,10867.54,9253.38,10469.00,10000.00,10867.54,10469.00,10469.00,10867.54,10867.54,10469.00,10000.00,9686.88,9686.88,10000.00,9253.38,10000.00,9686.88,10867.54])
+f4 = np.array([10867.54,10867.54,10867.54,10867.54,9686.88,9686.88,9686.88,10469.00,10000.00,10469.00,10000.00,10000.00,10867.54,10867.54,10469.00,9686.88,10000.00,9686.88,10469.00,10469.00,10000.00,9686.88,10000.00,10867.54,10000.00,10000.00,10469.00,10469.00,9686.88,9253.38,10867.54,10469.00,9686.88,9686.88,10469.00,10469.00,9686.88,10000.00,9686.88,9686.88])
+
+
+
+data_baseline = f0
+print ('f0',len(f0),len(f1),len(f2),len(f3), len(f4))
+#g.update_reference(data_baseline)
+# set the baseline. 
+
+#baseline = eit_reconstruction(f0)
+# do the reconstruction. 
+#difference_image = eit_reconstruction(f1)
+#print (difference_image)
+# #print(g.__dict__)
+
+img = []
+baseline_flag = 1
+n_el = 8 # number of electrodes. 
+step = 1 
+el_dist = 1 # random initialize number 
+
+# we create this according to an opposition protocol to maximize contrast. 
+ex_mat = eit_scan_lines(n_el =n_el, dist =el_dist)
+""" 0. construct mesh """
+# h0 is initial mesh size. , h0=0.1
+mesh_obj= mesh.create(n_el)
+el_pos = mesh_obj.el_pos
+protocol_obj = protocol.create(n_el, dist_exc=1, step_meas=1, parser_meas="std")
+
+# Define electrode current sink and current source
+#ex_line = protocol_obj.ex_mat[0].ravel()
+
+
+""" 3. Set Up BP """
+#BACKPROJECTION
+eit =  bp(mesh_obj, protocol_obj)
+#        self.eit =  bp(self.mesh_obj,self.el_pos, ex_mat=self.ex_mat, step=self.step, parser='std')
+
+eit.setup(weight='none')
+
+ds_bp_1 = eit.solve(f1, f0, normalize=True)
+difference_image_1= np.real(ds_bp_1)
+
+ds_bp_2 = eit.solve(f2, f0, normalize=True)
+difference_image_2= np.real(ds_bp_2)
+
+ds_bp_3 = eit.solve(f3, f0, normalize=True)
+difference_image_3= np.real(ds_bp_3)
+
+ds_bp_4 = eit.solve(f4, f0, normalize=True)
+difference_image_4= np.real(ds_bp_4)
+
+
+
+
+pts     = mesh_obj.node
+tri = mesh_obj.element
+x   = pts[:, 0]
+y   = pts[:, 1]
+
+#BACKPROJECTION
+fig, axes = plt.subplots(1,4)
+ax=axes[0]
+im_1 = ax.tripcolor(x,y, tri, difference_image_1,
+                  shading='flat', cmap=plt.cm.gnuplot)
+#fig.colorbar(im_1)
+ax.plot(x[el_pos], y[el_pos], 'ro')
+for i, e in enumerate(el_pos):
+    ax.text(x[e], y[e], str(i+1), size=12)
+ax.axis('equal')
+ax=axes[1]
+im_2 = ax.tripcolor(x,y, tri, difference_image_2,
+                  shading='flat', cmap=plt.cm.gnuplot)
+#fig.colorbar(im_2)
+ax.plot(x[el_pos], y[el_pos], 'ro')
+for i, e in enumerate(el_pos):
+    ax.text(x[e], y[e], str(i+1), size=12)
+ax.axis('equal')
+ax=axes[2]
+im_3 = ax.tripcolor(x,y, tri, difference_image_3,
+                  shading='flat', cmap=plt.cm.gnuplot)
+#fig.colorbar(im_3)
+ax.plot(x[el_pos], y[el_pos], 'ro')
+for i, e in enumerate(el_pos):
+    ax.text(x[e], y[e], str(i+1), size=12)
+ax.axis('equal')
+ax=axes[3]
+im_4 = ax.tripcolor(x,y, tri, difference_image_4,
+                  shading='flat', cmap=plt.cm.gnuplot)
+ax.plot(x[el_pos], y[el_pos], 'ro')
+#fig.colorbar(im_4)
+for i, e in enumerate(el_pos):
+    ax.text(x[e], y[e], str(i+1), size=12)
+ax.axis('equal')
+plt.show()
+
+
+
+

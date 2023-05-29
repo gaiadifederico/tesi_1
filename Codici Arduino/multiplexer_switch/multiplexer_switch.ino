@@ -36,6 +36,7 @@ void loop() {
       Serial.print(" Voltage MUX 4: ");
       Serial.print(((x+1)%SIZE));
       x = x+1;
+      //frequencySweep();
       delay(1000);
     }
     Serial.print("\n\nEND!!!\n\n\n\n");

@@ -8,7 +8,7 @@ ad5933-test
 
 
 
-#define START_FREQ  (19000)
+#define START_FREQ  (100000)
 #define FREQ_INCR   (1000)
 #define NUM_INCR    (1)
 #define REF_RESIST  (10000)

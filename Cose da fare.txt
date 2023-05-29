@@ -1,5 +1,8 @@
 schematico con componenti though hole
 mille fori con circuito saldato
-misure bioimpedenza (frutta/noi)
+
 GUI con bluetooth, mettere tutto sulla prima schermata, far vedere dati ricevuti
-presentazione per mercoledì 
+
+calibrare a valle dei MUX
+
+provare altri algoritmi

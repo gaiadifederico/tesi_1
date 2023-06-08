@@ -12,7 +12,7 @@ ad5933-multiplexer
 #define START_FREQ  (100000)
 #define FREQ_INCR   (1000)
 #define NUM_INCR    (1)
-#define REF_RESIST  (1000)
+#define REF_RESIST  (550)
 #define SIZE (8) //number of electrodes
 
 int vect[SIZE];
@@ -61,7 +61,7 @@ void setup(void)
   selectMuxPin_2(4);
   selectMuxPin_3(2);
   selectMuxPin_4(6);
-  delay(0.1);
+  delay(1);
 
 
 
@@ -95,7 +95,7 @@ void loop(void)
     switch (Serial.read()) {
       case 'a':
         index=0;
-        Serial.print("\n--ADJACENT INJECTION PROTOCOL--\n ");
+        //Serial.print("\n--ADJACENT INJECTION PROTOCOL--\n ");
         for(int i=0;i<SIZE;i++){
           selectMuxPin_1(i);
           //Serial.print("Current MUX 1:  ");
@@ -104,7 +104,7 @@ void loop(void)
           //Serial.print("  Current MUX 2:  ");
           //Serial.print(((i+1)%SIZE));
           //Serial.print("\nMeasure differential voltage pairs: \n");
-          delay(0.1);
+          delay(10);
           int x = i+2;
           for(int n=0; n<SIZE-3; n++){
             
@@ -118,20 +118,21 @@ void loop(void)
             selectMuxPin_4((x+1)%SIZE);
             //Serial.print(((x+1)%SIZE));
             x = x+1;
-            delay(1);
+            delay(10);
             frequencySweepAdj();
-            delay(1);
+            delay(10);
           }          
         }
         //Serial.print("\n\nEND!!!\n\n\n\n");
-        Serial.print("Numero dati acquisiti: ");
-        Serial.println(sizeof(impedance_measurement_adj)/4);
+        //Serial.print("Numero dati acquisiti: ");
+        //Serial.println(sizeof(impedance_measurement_adj)/4);
         for (int i=0; i<SIZE*10; i++){
           if(i%2==0){
            Serial.print(impedance_measurement_adj[i]);
            Serial.print(",");
           }
         }
+        Serial.print("\n");
         break;
       case 'b':
         index=0;

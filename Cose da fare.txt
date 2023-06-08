@@ -6,3 +6,10 @@ GUI con bluetooth, mettere tutto sulla prima schermata, far vedere dati ricevuti
 calibrare a valle dei MUX
 
 provare altri algoritmi
+
+py eit calibrazione differenziale
+eidors togliere rumore 
+filtro prima di immagine
+cambio contenitore
+Deep learning? 9 possibili posizioni (label), è possibile classificare solo con i numeri?
+interpetabilità del segnale?

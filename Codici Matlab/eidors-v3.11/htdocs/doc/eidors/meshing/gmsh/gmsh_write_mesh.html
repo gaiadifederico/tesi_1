@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gmsh_write_mesh</title>
+  <meta name="keywords" content="gmsh_write_mesh">
+  <meta name="description" content="gmsh_read_mesh(mdl, [data,] outfile)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">meshing</a> &gt; <a href="index.html">gmsh</a> &gt; gmsh_write_mesh.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/meshing/gmsh&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>gmsh_write_mesh
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>gmsh_read_mesh(mdl, [data,] outfile)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function gmsh_write_mesh(mdl, data, outfile) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">gmsh_read_mesh(mdl, [data,] outfile)
+ Write a GMSH .msh file (v4.1 format)
+
+ mdl      An EIDORS model (fwd_model or rec_model) or an image (img)
+ data     Per element data (optional)
+ outfile  Output filename, should end in '.msh'
+
+ If 'mdl' is an EIDORS image, then img.elem_data will be used if 'data' is not
+ provided.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>	GMSH_MK_FWD_MODEL: create a fwd_model object from a Gmsh file</li><li><a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>	gmsh_read_mesh(mdl, [data,] outfile)</li><li><a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>	MK_IMAGE: create eidors image object</li><li><a href="../../../eidors/models/select_imdl.html" class="code" title="function inv_mdl= select_imdl( mdl, options )">select_imdl</a>	SELECT_IMDL: select pre-packaged inverse model features</li><li><a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>	gmsh_read_mesh(mdl, [data,] outfile)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function do_unit_test()</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function gmsh_write_mesh(mdl, data, outfile)</a>
+0002 <span class="comment">%gmsh_read_mesh(mdl, [data,] outfile)</span>
+0003 <span class="comment">% Write a GMSH .msh file (v4.1 format)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% mdl      An EIDORS model (fwd_model or rec_model) or an image (img)</span>
+0006 <span class="comment">% data     Per element data (optional)</span>
+0007 <span class="comment">% outfile  Output filename, should end in '.msh'</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% If 'mdl' is an EIDORS image, then img.elem_data will be used if 'data' is not</span>
+0010 <span class="comment">% provided.</span>
+0011 
+0012 <span class="comment">% (C) 2021 Alistair Boyle. Licensed under GPL v2 or v3</span>
+0013 
+0014 <span class="keyword">if</span> ischar(mdl) &amp;&amp; strcmp(mdl,<span class="string">'UNIT_TEST'</span>); <a href="#_sub1" class="code" title="subfunction do_unit_test()">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0015 
+0016 is_img = (isfield(mdl, <span class="string">'type'</span>) &amp;&amp; strcmp(mdl.type, <span class="string">'image'</span>)) || isfield(mdl, <span class="string">'elem_data'</span>);
+0017 is_imdl = (isfield(mdl, <span class="string">'type'</span>) &amp;&amp; strcmp(mdl.type, <span class="string">'inv_model'</span>)) || isfield(mdl, <span class="string">'fwd_model'</span>);
+0018 
+0019 <span class="keyword">if</span> nargin &lt; 3
+0020     outfile = data;
+0021     data = [];
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="keyword">if</span> is_img &amp;&amp; isempty(data)
+0025     data = mdl.elem_data(:,1); <span class="comment">% TODO only handles first frame of data at the moment</span>
+0026 <span class="keyword">end</span>
+0027 assert(isempty(data) || size(data,2) == 1, <span class="string">'error: expect a single frame of data in gmsh_write_mesh'</span>);
+0028 
+0029 <span class="keyword">if</span> is_imdl || is_img
+0030     <span class="keyword">if</span> isfield(mdl, <span class="string">'rec_model'</span>)
+0031         mdl = mdl.rec_model;
+0032     <span class="keyword">else</span>
+0033         mdl = mdl.fwd_model;
+0034     <span class="keyword">end</span>
+0035 <span class="keyword">end</span>
+0036 assert(isempty(data) || size(data,1) == size(mdl.elems,1), <span class="string">'error: expect a data to match number of elements in gmsh_write_mesh'</span>);
+0037 
+0038 nn = size(mdl.nodes,1); <span class="comment">% number of nodes</span>
+0039 ne = size(mdl.elems,1); <span class="comment">% number of elements</span>
+0040 ndim = size(mdl.nodes,2); <span class="comment">% number of dimensions: 2=2D or 3=3D</span>
+0041 assert((ndim &gt;= 2) &amp;&amp; (ndim &lt;= 3), <span class="string">'not 2D or 3D?!'</span>);
+0042 
+0043 fid = fopen(outfile, <span class="string">'w'</span>);
+0044 fprintf(fid, <span class="string">'$MeshFormat\n'</span>);
+0045 fprintf(fid, <span class="string">'4.1 0 8\n'</span>); <span class="comment">% version file-type(0 for ASCII, 1 for binary) data-size=sizeof(size_t)</span>
+0046 fprintf(fid, <span class="string">'$EndMeshFormat\n'</span>);
+0047 fprintf(fid, <span class="string">'$Nodes\n'</span>);
+0048 fprintf(fid, <span class="string">'%d %d %d %d\n'</span>, 1, nn, 1, nn); <span class="comment">% numEntityBlocks numNodes minNodeTag maxNodeTag</span>
+0049 fprintf(fid, <span class="string">'%d %d %d %d\n'</span>, ndim, 0, 0, nn); <span class="comment">% entityDim entityTag parametric(0 or 1) numNodesInBlock</span>
+0050 fprintf(fid, <span class="string">'%d\n'</span>, 1:nn); <span class="comment">% nodeTag</span>
+0051 nodes = [ mdl.nodes zeros(nn, 3 - ndim) ]; <span class="comment">% always nn x 3, with z=0.0 if 2D</span>
+0052 fprintf(fid, <span class="string">'%f %f %f\n'</span>, nodes'); <span class="comment">% x y z</span>
+0053 fprintf(fid, <span class="string">'$EndNodes\n'</span>);
+0054 fprintf(fid, <span class="string">'$Elements\n'</span>);
+0055 <span class="keyword">if</span> ndim == 2
+0056     type = 2; <span class="comment">% triangle</span>
+0057 <span class="keyword">else</span>
+0058     type = 4; <span class="comment">% tetrahedra</span>
+0059 <span class="keyword">end</span>
+0060 fprintf(fid, <span class="string">'%d %d %d %d\n'</span>, 1, ne, 1, ne); <span class="comment">% numEntityBlocks numElements minElementTag maxElementTag</span>
+0061 fprintf(fid, <span class="string">'%d %d %d %d\n'</span>, ndim, 0, type, ne); <span class="comment">% entityDim entityTag elementType(4=tet) numElementsInBlock</span>
+0062 elems = [[1:ne]' mdl.elems];
+0063 <span class="keyword">if</span> ndim == 2
+0064     fprintf(fid, <span class="string">'%d %d %d %d\n'</span>, elems'); <span class="comment">% elementTag nodeTag ...</span>
+0065 <span class="keyword">else</span>
+0066     fprintf(fid, <span class="string">'%d %d %d %d %d\n'</span>, elems'); <span class="comment">% elementTag nodeTag ...</span>
+0067 <span class="keyword">end</span>
+0068 fprintf(fid, <span class="string">'$EndElements\n'</span>);
+0069 <span class="keyword">if</span> ~isempty(data)
+0070     fprintf(fid, <span class="string">'$ElementData\n'</span>);
+0071     fprintf(fid, <span class="string">'%d\n'</span>, 1); <span class="comment">% numStringTags</span>
+0072     name = <span class="string">'gmsh_write_mesh output'</span>;
+0073     <span class="keyword">if</span> isfield(mdl, <span class="string">'name'</span>)
+0074         name = mdl.name;
+0075     <span class="keyword">end</span>
+0076     fprintf(fid, <span class="string">'%s\n'</span>, name); <span class="comment">% stringTag</span>
+0077     fprintf(fid, <span class="string">'%d\n'</span>, 1); <span class="comment">% numRealTags</span>
+0078     fprintf(fid, <span class="string">'%f\n'</span>, 0); <span class="comment">% realTag(time=0)</span>
+0079     fprintf(fid, <span class="string">'%d\n'</span>, 3); <span class="comment">% numIntegerTags</span>
+0080     fprintf(fid, <span class="string">'%d\n'</span>, 0); <span class="comment">% integerTag(time-step=0)</span>
+0081     fprintf(fid, <span class="string">'%d\n'</span>, 1); <span class="comment">% integerTag(1-component/scalar field)</span>
+0082     fprintf(fid, <span class="string">'%d\n'</span>, ne); <span class="comment">% integerTag(associated element values)</span>
+0083     data = [[1:ne]' data];
+0084     fprintf(fid, <span class="string">'%d %f\n'</span>, data'); <span class="comment">% integerTag(associated element values)</span>
+0085     fprintf(fid, <span class="string">'$EndElementData\n'</span>);
+0086 <span class="keyword">end</span>
+0087 fclose(fid);
+0088 
+0089 <a name="_sub1" href="#_subfunctions" class="code">function do_unit_test()</a>
+0090 <span class="comment">% TODO cannot check 'data' because gmsh_read_mesh and gmsh_mk_fwd_model</span>
+0091 <span class="comment">%      don't know about ElementData regions in the .msh file</span>
+0092 outfile = tempname();
+0093 selfdir = fileparts(which(<span class="string">'gmsh_read_mesh'</span>));
+0094 mdl1 = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(fullfile(selfdir, <span class="string">'cube-4.1.msh'</span>));
+0095 mdl2 = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(fullfile(selfdir, <span class="string">'box-4.1.msh'</span>));
+0096 data1 = rand(size(mdl1.elems,1), 1);
+0097 data2 = rand(size(mdl1.elems,1), 1);
+0098 data3 = rand(size(mdl2.elems,1), 1);
+0099 
+0100 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(mdl1, data1, outfile);
+0101 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0102 delete(outfile);
+0103 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'fmdl+data (nn)'</span>, mdl1.nodes, mdl.nodes);
+0104 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'fmdl+data (el)'</span>, mdl1.elems, mdl.elems);
+0105 <span class="comment">% TODO check 'data' matches data1</span>
+0106 
+0107 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(mdl1, outfile);
+0108 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0109 delete(outfile);
+0110 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'fmdl (nn)'</span>, mdl1.nodes, mdl.nodes);
+0111 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'fmdl (ee)'</span>, mdl1.elems, mdl.elems);
+0112 <span class="comment">% TODO check 'data' does not exist</span>
+0113 
+0114 img = <a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(mdl1, data2);
+0115 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(img, data1, outfile);
+0116 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0117 delete(outfile);
+0118 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'img+data (nn)'</span>, mdl1.nodes, mdl.nodes);
+0119 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'img+data (ee)'</span>, mdl1.elems, mdl.elems);
+0120 <span class="comment">% TODO check 'data' matches data1</span>
+0121 
+0122 img = <a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(mdl1, data2);
+0123 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(img, outfile);
+0124 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0125 delete(outfile);
+0126 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'img (nn)'</span>, mdl1.nodes, mdl.nodes);
+0127 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'img (ee)'</span>, mdl1.elems, mdl.elems);
+0128 <span class="comment">% TODO check 'data' matches data2</span>
+0129 
+0130 imdl = <a href="../../../eidors/models/select_imdl.html" class="code" title="function inv_mdl= select_imdl( mdl, options )">select_imdl</a>(mdl1, {<span class="string">'Basic GN dif'</span>});
+0131 
+0132 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(imdl, outfile);
+0133 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0134 delete(outfile);
+0135 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+fmdl (nn)'</span>, mdl1.nodes, mdl.nodes);
+0136 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+fmdl (ee)'</span>, mdl1.elems, mdl.elems);
+0137 <span class="comment">% TODO check 'data' does not exist</span>
+0138 
+0139 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(imdl, data1, outfile);
+0140 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0141 delete(outfile);
+0142 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+fmdl+data (nn)'</span>, mdl1.nodes, mdl.nodes);
+0143 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+fmdl+data (ee)'</span>, mdl1.elems, mdl.elems);
+0144 <span class="comment">% TODO check 'data' matches data1</span>
+0145 
+0146 imdl.rec_model = mdl2;
+0147 
+0148 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(imdl, outfile);
+0149 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0150 delete(outfile);
+0151 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+rmdl (nn)'</span>, mdl2.nodes, mdl.nodes);
+0152 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+rmdl (ee)'</span>, mdl2.elems, mdl.elems);
+0153 <span class="comment">% TODO check 'data' does not exist</span>
+0154 
+0155 <a href="gmsh_write_mesh.html" class="code" title="function gmsh_write_mesh(mdl, data, outfile)">gmsh_write_mesh</a>(imdl, data3, outfile);
+0156 mdl = <a href="gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>(outfile);
+0157 delete(outfile);
+0158 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+rmdl+data (nn)'</span>, mdl2.nodes, mdl.nodes);
+0159 <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'imdl+rmdl+data (ee)'</span>, mdl2.elems, mdl.elems);
+0160 <span class="comment">% TODO check 'data' matches data3</span></pre></div>
+<hr><address>Generated on Fri 30-Dec-2022 20:46:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

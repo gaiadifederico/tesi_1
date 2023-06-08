@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of merge_meshes</title>
+  <meta name="keywords" content="merge_meshes">
+  <meta name="description" content="MERGE_MESHES - merges two meshes based on common nodes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">models</a> &gt; merge_meshes.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/models&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>merge_meshes
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>MERGE_MESHES - merges two meshes based on common nodes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function out = merge_meshes(M1,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MERGE_MESHES - merges two meshes based on common nodes
+ MERGE_MESHES(M1,M2,T) merges M2 in M1 using threshold T for detecting
+     corresponding nodes. The meshes must not overlap.
+ MERGE_MESHES(M1,M2,M3,..., T) merges M2, M3, ... into M1 (individually)
+
+ Note that the boundaries of the separate meshes will only be
+ concatenated, as this visualises nicely. To calculate the correct
+ boundary use FIND_BOUNDARY.
+
+ See also FIND_BOUNDARY</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>	SHOW_FEM: show the EIDORS3D finite element model</li><li><a href="../../eidors/meshing/netgen/ng_mk_cyl_models.html" class="code" title="function [fmdl,mat_idx] = ng_mk_cyl_models(cyl_shape, elec_pos,elec_shape, extra_ng_code);">ng_mk_cyl_models</a>	NG_MAKE_CYL_MODELS: create cylindrical models using netgen</li><li><a href="merge_meshes.html" class="code" title="function out = merge_meshes(M1,varargin)">merge_meshes</a>	MERGE_MESHES - merges two meshes based on common nodes</li><li><a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>	[srf, idx] = find_boundary(simp);</li><li><a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>	PROGRESS_MSG Progress messages and timing.</li><li><a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="merge_meshes.html" class="code" title="function out = merge_meshes(M1,varargin)">merge_meshes</a>	MERGE_MESHES - merges two meshes based on common nodes</li><li><a href="place_elec_on_surf.html" class="code" title="function mdl2 = place_elec_on_surf(mdl,elec_pos, elec_spec,ng_opt_file, maxh)">place_elec_on_surf</a>	PLACE_ELEC_ON_SURF Place electrodes on the surface of a model</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function M1 = naive_join(M1,M2)</a></li><li><a href="#_sub2" class="code">function use = nodes_in_bounding_box(M2,M1,th)</a></li><li><a href="#_sub3" class="code">function use = nodes_near_node(nodes,node,th)</a></li><li><a href="#_sub4" class="code">function run_unit_test</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function out = merge_meshes(M1,varargin)</a>
+0002 <span class="comment">%MERGE_MESHES - merges two meshes based on common nodes</span>
+0003 <span class="comment">% MERGE_MESHES(M1,M2,T) merges M2 in M1 using threshold T for detecting</span>
+0004 <span class="comment">%     corresponding nodes. The meshes must not overlap.</span>
+0005 <span class="comment">% MERGE_MESHES(M1,M2,M3,..., T) merges M2, M3, ... into M1 (individually)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Note that the boundaries of the separate meshes will only be</span>
+0008 <span class="comment">% concatenated, as this visualises nicely. To calculate the correct</span>
+0009 <span class="comment">% boundary use FIND_BOUNDARY.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% See also FIND_BOUNDARY</span>
+0012 
+0013 <span class="comment">% (C) Bartlomiej Grychtol and Andy Adler, 2012-2013. Licence: GPL v2 or v3</span>
+0014 <span class="comment">% $Id: merge_meshes.m 6454 2022-12-04 22:11:44Z bgrychtol $</span>
+0015 
+0016 <span class="keyword">if</span> ischar(M1) &amp;&amp; strcmp(M1,<span class="string">'UNIT_TEST'</span>), <a href="#_sub4" class="code" title="subfunction run_unit_test">run_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0017 
+0018 <span class="keyword">if</span> nargin &lt; 3  || isstruct(varargin{end})
+0019    th = mean(std(M1.nodes))/length(M1.nodes);
+0020    shapes = varargin;
+0021 <span class="keyword">else</span>
+0022    th = varargin{end};
+0023    shapes = varargin(1:end-1);
+0024 <span class="keyword">end</span>
+0025 <span class="keyword">if</span> ~isfield(M1, <span class="string">'boundary'</span>);
+0026    M1.boundary = <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(M1);
+0027 <span class="keyword">end</span>
+0028 <span class="keyword">if</span> ~isfield(M1, <span class="string">'mat_idx'</span>)
+0029    M1.mat_idx = {1:length(M1.elems)};
+0030 <span class="keyword">end</span>
+0031 
+0032 do_msg = length(shapes) &gt; 1;
+0033 <span class="keyword">if</span> do_msg, <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Merging mesh %d/%d ... '</span>,0,length(shapes))); <span class="keyword">end</span>
+0034 
+0035 <span class="comment">% Use a for loop, vectorised approach can run out of memory</span>
+0036 <span class="keyword">for</span> i = 1:length(shapes)
+0037    <span class="keyword">if</span> do_msg
+0038       <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(sprintf(<span class="string">'Merging mesh %d/%d ... '</span>,i,length(shapes)));
+0039    <span class="keyword">end</span>
+0040    l1 = length(M1.nodes);
+0041    M2 = shapes{i};
+0042    <span class="keyword">if</span> ~isfield(M2, <span class="string">'boundary'</span>);
+0043       M2.boundary = <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(M2);
+0044    <span class="keyword">end</span>
+0045    <span class="keyword">if</span> ~isfield(M2, <span class="string">'mat_idx'</span>)
+0046       M2.mat_idx = {1:length(M2.elems)};
+0047    <span class="keyword">end</span>
+0048    <span class="comment">% make sure boundaries are the same dimension</span>
+0049    <span class="keyword">if</span> size(M1.boundary,2) == 2 &amp;&amp; size(M2.boundary,2)==3
+0050       <span class="comment">% M1 is 2D, M2 is 3D</span>
+0051       M1.boundary = M1.elems;
+0052    <span class="keyword">elseif</span> size(M1.boundary,2) == 3 &amp;&amp; size(M2.boundary,2)==2
+0053       M2.boundary = M2.elems;
+0054    <span class="keyword">end</span>
+0055    
+0056    useM1 = <a href="#_sub2" class="code" title="subfunction use = nodes_in_bounding_box(M2,M1,th)">nodes_in_bounding_box</a>(M2,M1,th);
+0057    useM1 = find(useM1);
+0058    useM2 = <a href="#_sub2" class="code" title="subfunction use = nodes_in_bounding_box(M2,M1,th)">nodes_in_bounding_box</a>(M1,M2,th);
+0059    
+0060    <span class="keyword">if</span> isempty(useM1) || all(~useM2(:))
+0061       M1 = <a href="#_sub1" class="code" title="subfunction M1 = naive_join(M1,M2)">naive_join</a>(M1,M2);
+0062       <span class="keyword">continue</span>
+0063    <span class="keyword">end</span>
+0064    
+0065    nodes_to_add = M2.nodes(~useM2,:);
+0066    n_new_nodes = nnz(~useM2);
+0067    match = zeros(length(M2.nodes),1);
+0068    match(~useM2) = l1 + (1:n_new_nodes);
+0069    useM2 = find(useM2);
+0070    N = length(useM2');
+0071    <span class="keyword">for</span> j = 1:N
+0072       <span class="keyword">if</span> mod(j,100)==1, <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(j/N); <span class="keyword">end</span>
+0073       n = useM2(j); 
+0074       
+0075       use = <a href="#_sub3" class="code" title="subfunction use = nodes_near_node(nodes,node,th)">nodes_near_node</a>(M1.nodes(useM1,:), M2.nodes(n,:), 1.1*th);
+0076       <span class="keyword">switch</span> nnz(use)
+0077          <span class="keyword">case</span> 0
+0078          <span class="keyword">case</span> 1
+0079             match(n) = useM1(use);
+0080          <span class="keyword">otherwise</span>
+0081             use = useM1(use);
+0082             len_use = length(use);
+0083             D = M1.nodes(use,:) - ones(len_use,1)*M2.nodes(n,:);
+0084             D = sum(D.^2,2); <span class="comment">% sqrt(sum(D.^2,2)); % don't need to sqrt</span>
+0085             [val p] = min(D);
+0086             <span class="keyword">if</span> val &lt; th^2    <span class="comment">% but then need th^2</span>
+0087                match(n) = use(p); <span class="comment">% matching node of M1</span>
+0088             <span class="keyword">end</span>
+0089       <span class="keyword">end</span>
+0090       <span class="keyword">if</span> ~match(n)
+0091          match(n) = l1 + n_new_nodes+1;
+0092          n_new_nodes = n_new_nodes + 1;
+0093          nodes_to_add = [nodes_to_add; M2.nodes(n,:)];
+0094       <span class="keyword">end</span>
+0095    <span class="keyword">end</span>
+0096    <span class="keyword">if</span> do_msg, <a href="../../eidors/tools/progress_msg.html" class="code" title="function progress_msg(varargin)">progress_msg</a>(Inf); <span class="keyword">end</span>
+0097    M1.nodes = [M1.nodes; nodes_to_add];
+0098    LE = length(M1.elems);
+0099    <span class="keyword">for</span> j = 1:numel(M2.mat_idx)
+0100       M1.mat_idx{end+1} = LE+M2.mat_idx{j};
+0101    <span class="keyword">end</span>
+0102    <span class="comment">%M1.mat_idx = [M1.mat_idx {length(M1.elems)+(1:length(M2.elems))}];</span>
+0103    M1.elems = [M1.elems; match(M2.elems)];
+0104    <span class="comment">% this is not strictly correct, but visualizes nicely</span>
+0105    M1.boundary = [M1.boundary; match(M2.boundary)]; 
+0106 <span class="keyword">end</span>
+0107 
+0108 out =  M1;
+0109 <span class="comment">% rmfield(M1,'boundary');</span>
+0110 
+0111 <a name="_sub1" href="#_subfunctions" class="code">function M1 = naive_join(M1,M2)</a>
+0112 LN = length(M1.nodes);
+0113 LE = length(M1.elems);
+0114 M1.nodes = [M1.nodes; M2.nodes];
+0115 M1.elems = [M1.elems; LN+M2.elems];
+0116 <span class="keyword">for</span> i = 1:numel(M2.mat_idx)
+0117    M1.mat_idx{end+1} = LE+M2.mat_idx{i};
+0118 <span class="keyword">end</span>
+0119 M1.boundary = [M1.boundary; LN+M2.boundary];
+0120    
+0121 
+0122 <a name="_sub2" href="#_subfunctions" class="code">function use = nodes_in_bounding_box(M2,M1,th)</a>
+0123    <span class="comment">% limit to nodes in M1 that are within the bounding box of M2</span>
+0124    maxM2 = max(M2.nodes)+th;
+0125    minM2 = min(M2.nodes)-th;
+0126    use = true(length(M1.nodes),1);
+0127    <span class="keyword">for</span> i = 1:size(M1.nodes,2);
+0128       use = use &amp; M1.nodes(:,i) &lt; maxM2(i) &amp; M1.nodes(:,i) &gt; minM2(i);
+0129    <span class="keyword">end</span>
+0130 
+0131 <a name="_sub3" href="#_subfunctions" class="code">function use = nodes_near_node(nodes,node,th)</a>
+0132    maxlim = node + th;
+0133    minlim = node - th;
+0134    use = true(size(nodes,1),1);
+0135    <span class="keyword">for</span> i = 1:size(nodes,2);
+0136       use = use &amp; nodes(:,i) &lt; maxlim(i) &amp; nodes(:,i) &gt; minlim(i);
+0137    <span class="keyword">end</span>
+0138 
+0139 <a name="_sub4" href="#_subfunctions" class="code">function run_unit_test</a>
+0140 subplot(221)
+0141 cyl = <a href="../../eidors/meshing/netgen/ng_mk_cyl_models.html" class="code" title="function [fmdl,mat_idx] = ng_mk_cyl_models(cyl_shape, elec_pos,elec_shape, extra_ng_code);">ng_mk_cyl_models</a>(3,[0],[]);
+0142 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(cyl)
+0143 
+0144 subplot(222)
+0145 top_nodes = cyl.nodes(:,3)&gt;=1.5;
+0146 top_elems = sum(top_nodes(cyl.elems),2)==4;
+0147 top.elems = cyl.elems(top_elems,:);
+0148 nds = unique(top.elems);
+0149 map = zeros(1,length(cyl.nodes));
+0150 map(nds) = 1:length(nds);
+0151 top.elems = map(top.elems);
+0152 top.nodes = cyl.nodes(nds,:);
+0153 top.type = <span class="string">'fwd_model'</span>;
+0154 top.boundary = <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(top);
+0155 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(top)
+0156 zlim([0 3]);
+0157 
+0158 subplot(223)
+0159 bot_elems = ~top_elems;
+0160 bot.elems = cyl.elems(bot_elems,:);
+0161 nds = unique(bot.elems);
+0162 map = zeros(1,length(cyl.nodes));
+0163 map(nds) = 1:length(nds);
+0164 bot.elems = map(bot.elems);
+0165 bot.nodes = cyl.nodes(nds,:);
+0166 bot.type = <span class="string">'fwd_model'</span>;
+0167 bot.boundary = <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(bot);
+0168 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(bot)
+0169 zlim([0 3]);
+0170 
+0171 
+0172 subplot(224)
+0173 M = <a href="merge_meshes.html" class="code" title="function out = merge_meshes(M1,varargin)">merge_meshes</a>(bot, top);
+0174 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(M);
+0175 
+0176 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Number of nodes'</span>,length(cyl.nodes), length(M.nodes),0);
+0177 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Number of elems'</span>,length(cyl.elems), length(M.elems),0);</pre></div>
+<hr><address>Generated on Fri 30-Dec-2022 20:46:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

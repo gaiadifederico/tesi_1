@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of test_3d_resistor</title>
+  <meta name="keywords" content="test_3d_resistor">
+  <meta name="description" content="Create 3D model of a Rectangular resistor">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">tests</a> &gt; test_3d_resistor.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/tests&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>test_3d_resistor
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Create 3D model of a Rectangular resistor</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function test_3d_resistor </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Create 3D model of a Rectangular resistor
+ $Id: test_3d_resistor.m 6246 2022-03-23 13:45:26Z aadler $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/deprecated/np_calc_jacobian.html" class="code" title="function J= np_calc_jacobian( fwd_model, img)">np_calc_jacobian</a>	NP_CALC_JACOBIAN: J= np_calc_jacobian( fwd_model, img)</li><li><a href="../../eidors/deprecated/np_fwd_solve.html" class="code" title="function data= np_fwd_solve( fwd_model, img)">np_fwd_solve</a>	NP_FWD_SOLVE: data= np_fwd_solve( fwd_model, img)</li><li><a href="../../eidors/eidors_obj.html" class="code" title="function [obj_id, extra_out] = eidors_obj(type,name, varargin )">eidors_obj</a>	EIDORS_OBJ: maintains EIDORS internals</li><li><a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>	SHOW_FEM: show the EIDORS3D finite element model</li><li><a href="../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>	MDL_NORMALIZE Check or set the normalize_measurements flag on a model.</li><li><a href="../../eidors/models/mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>	MK_GRID_MODEL: Create reconstruction model on pixelated grid</li><li><a href="../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>	MK_IMAGE: create eidors image object</li><li><a href="../../eidors/models/stim_meas_list.html" class="code" title="function [stim, meas_sel]= stim_meas_list( sp_mp , Nelec, current, gain);">stim_meas_list</a>	STIM_MEAS_LIST: mk stimulation pattern from list of electrodes</li><li><a href="../../eidors/solvers/calc_jacobian.html" class="code" title="function J = calc_jacobian( fwd_model, img)">calc_jacobian</a>	CALC_JACOBIAN: calculate jacobian from an inv_model</li><li><a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>	[srf, idx] = find_boundary(simp);</li><li><a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>	FWD_SOLVE_1ST_ORDER: data= fwd_solve_1st_order( img)</li><li><a href="../../eidors/solvers/forward/jacobian_adjoint.html" class="code" title="function J= jacobian_adjoint( fwd_model, img)">jacobian_adjoint</a>	JACOBIAN_ADJOINT: J= jacobian_adjoint( img )</li><li><a href="../../eidors/solvers/forward/jacobian_perturb.html" class="code" title="function J= jacobian_perturb( fwd_model, img)">jacobian_perturb</a>	JACOBIAN_PERTURB: J= jacobian_perturb( fwd_model, img)</li><li><a href="../../eidors/solvers/forward/system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>	SYSTEM_MAT_1ST_ORDER: SS= system_mat_1st_order( fwd_model, img)</li><li><a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>	FWD_SOLVE: calculate data from a fwd_model object and an image</li><li><a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/deprecated/np_fwd_solve.html" class="code" title="function data= np_fwd_solve( fwd_model, img)">np_fwd_solve</a>	NP_FWD_SOLVE: data= np_fwd_solve( fwd_model, img)</li><li><a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>	FWD_SOLVE_1ST_ORDER: data= fwd_solve_1st_order( img)</li><li><a href="../../eidors/solvers/forward/jacobian_adjoint.html" class="code" title="function J= jacobian_adjoint( fwd_model, img)">jacobian_adjoint</a>	JACOBIAN_ADJOINT: J= jacobian_adjoint( img )</li><li><a href="../../eidors/solvers/forward/system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>	SYSTEM_MAT_1ST_ORDER: SS= system_mat_1st_order( fwd_model, img)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function cleaner_code</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Create 3D model of a Rectangular resistor</span>
+0002 <span class="comment">% $Id: test_3d_resistor.m 6246 2022-03-23 13:45:26Z aadler $</span>
+0003 <a name="_sub0" href="#_subfunctions" class="code">function test_3d_resistor</a>
+0004 
+0005 ll=5*1; <span class="comment">% length</span>
+0006 ww=1*2; <span class="comment">% width</span>
+0007 hh=1*3; <span class="comment">% height</span>
+0008 conduc= .13;  <span class="comment">% conductivity in Ohm-meters</span>
+0009 current= 4;  <span class="comment">% Amps</span>
+0010 z_contact= 1e-1;
+0011 scale = .46;
+0012 mdl= <a href="../../eidors/eidors_obj.html" class="code" title="function [obj_id, extra_out] = eidors_obj(type,name, varargin )">eidors_obj</a>(<span class="string">'fwd_model'</span>,<span class="string">'3D rectangle'</span>);
+0013 nn=0;
+0014 <span class="keyword">for</span> z=0:ll; <span class="keyword">for</span> x=0:ww; <span class="keyword">for</span> y=0:hh
+0015    nn=nn+1;
+0016    mdl.nodes(nn,:) = [x,y,z];
+0017 <span class="keyword">end</span>; <span class="keyword">end</span>; <span class="keyword">end</span>
+0018 
+0019 <span class="keyword">if</span> 0
+0020 <span class="comment">% Matlab's delaunayn triangularization is screwed up</span>
+0021    mdl.elems = delaunayn(mdl.nodes);
+0022 <span class="keyword">elseif</span> 0
+0023 <span class="comment">% Matlab's delaunay3 triangularization is screwed up</span>
+0024    mdl.elems = delaunay3(mdl.nodes(:,1), mdl.nodes(:,2), mdl.nodes(:,3));
+0025 <span class="keyword">elseif</span> 0
+0026    elem1= [ 1 2 3 5; 5 6 2 3; 5 6 7 3; <span class="keyword">...</span>
+0027             4 2 3 8; 8 6 2 3; 8 6 7 3;];
+0028    mdl.elems=[];
+0029    <span class="keyword">for</span> i=0:ll-1;
+0030        mdl.elems= [mdl.elems; elem1+4*i];
+0031    <span class="keyword">end</span>
+0032 <span class="keyword">else</span>
+0033    mdl= <a href="../../eidors/models/mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>([],0:ww,0:hh,0:ll);
+0034    mdl.nodes= mdl.nodes*scale;
+0035    mdl= rmfield(mdl,<span class="string">'coarse2fine'</span>);
+0036 <span class="keyword">end</span>
+0037 mdl.boundary= <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(mdl.elems);
+0038 mdl.gnd_node = 1;
+0039 elec_nodes= [1:(ww+1)*(hh+1)];
+0040 elec(1).nodes= elec_nodes;      elec(1).z_contact= z_contact;
+0041 elec(2).nodes= nn-elec_nodes+1; elec(2).z_contact= z_contact;
+0042 stim.stim_pattern= [-1;1]*current;
+0043 stim.meas_pattern= [-1,1];
+0044 mdl.stimulation= stim;
+0045 mdl.electrode= elec;
+0046 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(mdl);
+0047 mdl = <a href="../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>(mdl,0);
+0048 
+0049 
+0050 
+0051 mdl.solve = @<a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>;
+0052 mdl.system_mat = @<a href="../../eidors/solvers/forward/system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>;
+0053 
+0054 n_el = size(mdl.elems,1);
+0055 img= <a href="../../eidors/eidors_obj.html" class="code" title="function [obj_id, extra_out] = eidors_obj(type,name, varargin )">eidors_obj</a>(<span class="string">'image'</span>,<span class="string">'3D rectangle'</span>, <span class="keyword">...</span>
+0056       <span class="string">'elem_data'</span>, ones(n_el,1) * conduc, <span class="keyword">...</span>
+0057       <span class="string">'fwd_model'</span>, mdl); 
+0058 
+0059 fsol= <a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0060 fprintf(<span class="string">'Solver %s: %f\n'</span>, fsol.name, fsol.meas);
+0061 
+0062 <span class="comment">% analytical solution</span>
+0063 Block_R =  ll / ww / hh / scale/ conduc;
+0064 Contact_R = z_contact/(ww*hh)/scale^2;
+0065 <span class="comment">% Contact R reflects z_contact / (width/scale)^2. Here we need to use</span>
+0066 <span class="comment">%  the scale, since this is not reflected in the size of the</span>
+0067 <span class="comment">%  FEM as created by the grid. This is different to the test_2d_resistor,</span>
+0068 <span class="comment">%  where the FEM is created scaled, so that the ww</span>
+0069 <span class="comment">%  don't need to be scaled by the scale parameter.</span>
+0070 R = Block_R + 2*Contact_R;
+0071 
+0072 V= current*R;
+0073 fprintf(<span class="string">'Solver %s: %f\n'</span>, <span class="string">'analytic'</span>, V);
+0074 fprintf(<span class="string">'Solver %s: %f\n'</span>, <span class="string">'analytic (no z_contact)'</span>, V - 2*Contact_R*current);
+0075 
+0076 <span class="keyword">if</span> 0 <span class="comment">% OLD CODE</span>
+0077    mdl.solve = @<a href="../../eidors/deprecated/np_fwd_solve.html" class="code" title="function data= np_fwd_solve( fwd_model, img)">np_fwd_solve</a>;
+0078    mdl.jacobian = @<a href="../../eidors/deprecated/np_calc_jacobian.html" class="code" title="function J= np_calc_jacobian( fwd_model, img)">np_calc_jacobian</a>;
+0079 <span class="keyword">else</span>
+0080    mdl.solve = @<a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>;
+0081    mdl.jacobian= @<a href="../../eidors/solvers/forward/jacobian_adjoint.html" class="code" title="function J= jacobian_adjoint( fwd_model, img)">jacobian_adjoint</a>;
+0082 <span class="keyword">end</span>
+0083 mdl.misc.perm_sym= <span class="string">'{n}'</span>;
+0084 mdl.normalize_measurements = 0;
+0085 img= <a href="../../eidors/eidors_obj.html" class="code" title="function [obj_id, extra_out] = eidors_obj(type,name, varargin )">eidors_obj</a>(<span class="string">'image'</span>,<span class="string">'3D rectangle'</span>, <span class="keyword">...</span>
+0086       <span class="string">'elem_data'</span>, ones(size(mdl.elems,1),1) * conduc, <span class="keyword">...</span>
+0087       <span class="string">'fwd_model'</span>, mdl); 
+0088 
+0089 fsol= <a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0090 fprintf(<span class="string">'Solver %s: %f\n'</span>, fsol.name, fsol.meas);
+0091 
+0092 
+0093 <span class="comment">% NOW CALCULATE THE ANALYTICAL JACOBIAN</span>
+0094 <span class="keyword">if</span> 0 <span class="comment">% OLD CODE</span>
+0095    mdl.solve = @<a href="../../eidors/deprecated/np_fwd_solve.html" class="code" title="function data= np_fwd_solve( fwd_model, img)">np_fwd_solve</a>;
+0096    mdl.jacobian = @<a href="../../eidors/deprecated/np_calc_jacobian.html" class="code" title="function J= np_calc_jacobian( fwd_model, img)">np_calc_jacobian</a>;
+0097 <span class="keyword">else</span>
+0098    mdl.solve = @<a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>;
+0099    mdl.jacobian= @<a href="../../eidors/solvers/forward/jacobian_adjoint.html" class="code" title="function J= jacobian_adjoint( fwd_model, img)">jacobian_adjoint</a>;
+0100 <span class="keyword">end</span>
+0101 img.fwd_model = mdl;
+0102 img.elem_data= ones(n_el,1) * conduc ;
+0103 Jnp= <a href="../../eidors/solvers/calc_jacobian.html" class="code" title="function J = calc_jacobian( fwd_model, img)">calc_jacobian</a>(img);
+0104 
+0105 mdl.jacobian = @<a href="../../eidors/solvers/forward/jacobian_perturb.html" class="code" title="function J= jacobian_perturb( fwd_model, img)">jacobian_perturb</a>;
+0106 Jp1= <a href="../../eidors/solvers/calc_jacobian.html" class="code" title="function J = calc_jacobian( fwd_model, img)">calc_jacobian</a>(img);
+0107 
+0108 img.elem_data= ones(n_el,1) * conduc ;
+0109 Jp2= zeros(size(Jnp));
+0110 delta= 1e-8;
+0111 <span class="keyword">for</span> i=1:n_el
+0112    fsol_h= <a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0113    img.elem_data(i) = img.elem_data(i) + delta;
+0114    fsol_i= <a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(img);
+0115    Jp2(:,i) = (fsol_i.meas - fsol_h.meas)/delta; 
+0116 <span class="keyword">end</span>
+0117    
+0118 mdl.solve = @<a href="../../eidors/solvers/forward/fwd_solve_1st_order.html" class="code" title="function data =fwd_solve_1st_order(fwd_model, img)">fwd_solve_1st_order</a>;
+0119 mdl.jacobian = @<a href="../../eidors/solvers/forward/jacobian_adjoint.html" class="code" title="function J= jacobian_adjoint( fwd_model, img)">jacobian_adjoint</a>;
+0120 Jaa= <a href="../../eidors/solvers/calc_jacobian.html" class="code" title="function J = calc_jacobian( fwd_model, img)">calc_jacobian</a>(img);
+0121 
+0122 fprintf(<span class="string">'Jacobians: Cols by Jaa, Jnp, Jp1, Jp2\n'</span>);
+0123 JJ = [Jaa;Jnp;Jp1;Jp2];
+0124 disp(JJ(:,1:6))
+0125 
+0126 <span class="comment">% UNIT_TEST</span>
+0127 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Jaa vs Jnp'</span>, Jaa, Jnp, 1e-6);
+0128 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Jaa vs Jp1'</span>, Jaa, Jp1, 1e-6);
+0129 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'Jaa vs Jp2'</span>, Jaa, Jp2, 1e-3);
+0130 
+0131 
+0132 <a name="_sub1" href="#_subfunctions" class="code">function cleaner_code</a>
+0133 <span class="comment">% Cleaner code using newer EIDORS helper functions (AA - dec 2018)</span>
+0134 ll=5; ww=1; hh=1; z_contact= 1e-1; conduc= .13; current= 4; scale = .46;
+0135 mdl= rmfield( <a href="../../eidors/models/mk_grid_model.html" class="code" title="function [cmdl, c2f]= mk_grid_model(fmdl, xvec, yvec, zvec);">mk_grid_model</a>([],0:ww,0:hh,0:ll), <span class="string">'coarse2fine'</span>);
+0136 mdl.boundary= <a href="../../eidors/solvers/forward/find_boundary.html" class="code" title="function [srf, idx] = find_boundary(simp);">find_boundary</a>(mdl.elems); mdl.gnd_node = 1;
+0137 mdl.electrode(1)=struct(<span class="string">'z_contact'</span>, z_contact, <span class="string">'nodes'</span>, <span class="keyword">...</span>
+0138      find(mdl.nodes(:,3)==0));
+0139 mdl.electrode(2)=struct(<span class="string">'z_contact'</span>, z_contact, <span class="string">'nodes'</span>, <span class="keyword">...</span>
+0140      find(mdl.nodes(:,3)==ll));
+0141 mdl.stimulation= <a href="../../eidors/models/stim_meas_list.html" class="code" title="function [stim, meas_sel]= stim_meas_list( sp_mp , Nelec, current, gain);">stim_meas_list</a>([1,2,1,2],2,current);
+0142 mdl.nodes = mdl.nodes * scale;
+0143 <a href="../../eidors/graphics/matlab/show_fem.html" class="code" title="function hh=show_fem( mdl, options)">show_fem</a>(mdl);
+0144 Block_R =  ll / ww / hh / scale/ conduc;
+0145 Contact_R = z_contact/(ww*hh)/scale^2;
+0146 Vs = current * ( Block_R + 2*Contact_R );
+0147 vh = <a href="../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(<a href="../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(mdl, conduc));
+0148 <a href="../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'3D Resistor'</span>,Vs, vh.meas, 1e-10);</pre></div>
+<hr><address>Generated on Fri 30-Dec-2022 20:46:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

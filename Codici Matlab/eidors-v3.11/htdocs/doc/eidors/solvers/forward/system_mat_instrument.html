@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of system_mat_instrument</title>
+  <meta name="keywords" content="system_mat_instrument">
+  <meta name="description" content="SYSTEM_MAT_INSTRUMENT:">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">solvers</a> &gt; <a href="index.html">forward</a> &gt; system_mat_instrument.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/solvers/forward&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>system_mat_instrument
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SYSTEM_MAT_INSTRUMENT:</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function s_mat = system_mat_instrument( img); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> SYSTEM_MAT_INSTRUMENT: 
+  Calculate systems matrix inclusing modelling of instrument impedance
+ img.fwd_model.system_mat = @system_mat_instrument
+ img.fwd_model.system_mat_instrument.clist = [CONNECTION LIST]
+ 
+ where
+  connection list =
+     [node1a, node1b, admittance_1ab]
+     [node2a, node2b, admittance_2ab]
+
+ Instrument electrode can be added using
+  fmdl.electrode(end+1) = struct('nodes','instrument','z_contact',NaN);
+  Such electrodes must be last
+
+ CITATION_REQUEST:
+ AUTHOR: A Adler
+ TITLE: Modelling instrument admittances with EIDORS
+ CONFERENCE: EIT 2021
+ YEAR: 2021
+ PAGE: 74
+ LINK: https://zenodo.org/record/4940249</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/eidors_obj.html" class="code" title="function [obj_id, extra_out] = eidors_obj(type,name, varargin )">eidors_obj</a>	EIDORS_OBJ: maintains EIDORS internals</li><li><a href="../../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>	MDL_NORMALIZE Check or set the normalize_measurements flag on a model.</li><li><a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>	MK_IMAGE: create eidors image object</li><li><a href="../../../eidors/models/num_elecs.html" class="code" title="function num = num_elecs( mdl );">num_elecs</a>	NUM_ELECS: number of electrodes attached to model</li><li><a href="../../../eidors/models/num_nodes.html" class="code" title="function num = num_nodes( mdl );">num_nodes</a>	NUM_NODES: number of elemnts in a (fwd or inv model or image)</li><li><a href="../../../eidors/models/stim_meas_list.html" class="code" title="function [stim, meas_sel]= stim_meas_list( sp_mp , Nelec, current, gain);">stim_meas_list</a>	STIM_MEAS_LIST: mk stimulation pattern from list of electrodes</li><li><a href="../../../eidors/overloads/sparse/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>	SPARSE Create sparse matrix (EIDORS overload).</li><li><a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>	CALC_SYSTEM_MAT: calculate FEM system matrix from fwd_model and image</li><li><a href="system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>	SYSTEM_MAT_1ST_ORDER: SS= system_mat_1st_order( fwd_model, img)</li><li><a href="system_mat_instrument.html" class="code" title="function s_mat = system_mat_instrument( img);">system_mat_instrument</a>	SYSTEM_MAT_INSTRUMENT:</li><li><a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>	FWD_SOLVE: calculate data from a fwd_model object and an image</li><li><a href="../../../eidors/tools/citeme.html" class="code" title="function citeme(fname)">citeme</a>	CITEME Display citation requests</li><li><a href="../../../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>	EIDORS_DEFAULT Default function handler.</li><li><a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>	UNIT_TEST_CMP: compare matrices in eidors output</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="system_mat_instrument.html" class="code" title="function s_mat = system_mat_instrument( img);">system_mat_instrument</a>	SYSTEM_MAT_INSTRUMENT:</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function do_unit_test</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function s_mat = system_mat_instrument( img);</a>
+0002 <span class="comment">% SYSTEM_MAT_INSTRUMENT:</span>
+0003 <span class="comment">%  Calculate systems matrix inclusing modelling of instrument impedance</span>
+0004 <span class="comment">% img.fwd_model.system_mat = @system_mat_instrument</span>
+0005 <span class="comment">% img.fwd_model.system_mat_instrument.clist = [CONNECTION LIST]</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% where</span>
+0008 <span class="comment">%  connection list =</span>
+0009 <span class="comment">%     [node1a, node1b, admittance_1ab]</span>
+0010 <span class="comment">%     [node2a, node2b, admittance_2ab]</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Instrument electrode can be added using</span>
+0013 <span class="comment">%  fmdl.electrode(end+1) = struct('nodes','instrument','z_contact',NaN);</span>
+0014 <span class="comment">%  Such electrodes must be last</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% CITATION_REQUEST:</span>
+0017 <span class="comment">% AUTHOR: A Adler</span>
+0018 <span class="comment">% TITLE: Modelling instrument admittances with EIDORS</span>
+0019 <span class="comment">% CONFERENCE: EIT 2021</span>
+0020 <span class="comment">% YEAR: 2021</span>
+0021 <span class="comment">% PAGE: 74</span>
+0022 <span class="comment">% LINK: https://zenodo.org/record/4940249</span>
+0023 
+0024 <span class="comment">% (C) 2021 Andy Adler. License: GPL version 2 or version 3</span>
+0025 <span class="comment">% $Id: system_mat_instrument.m 6478 2022-12-26 00:26:34Z aadler $</span>
+0026 
+0027    <span class="keyword">if</span> ischar(img) &amp;&amp; strcmp(img,<span class="string">'UNIT_TEST'</span>); <a href="#_sub1" class="code" title="subfunction do_unit_test">do_unit_test</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0028 
+0029    <a href="../../../eidors/tools/citeme.html" class="code" title="function citeme(fname)">citeme</a>(mfilename)
+0030 
+0031    new_c_list = img.fwd_model.system_mat_instrument.connect_list;
+0032 
+0033 <span class="comment">% pre-delete all 'instrument' nodes</span>
+0034 <span class="comment">% system matrix can't handle them</span>
+0035 <span class="comment">% BUG ALERT: instrument nodes must be at end</span>
+0036    <span class="keyword">for</span> i=<a href="../../../eidors/models/num_elecs.html" class="code" title="function num = num_elecs( mdl );">num_elecs</a>(img):-1:1
+0037       enodes = img.fwd_model.electrode(i).nodes;
+0038       <span class="keyword">if</span> ischar(enodes) &amp;&amp; strcmp(enodes,<span class="string">'instrument'</span>);
+0039          img.fwd_model.electrode(i)= [];
+0040       <span class="keyword">end</span>
+0041    <span class="keyword">end</span>
+0042    s_mat= <a href="system_mat_1st_order.html" class="code" title="function s_mat= system_mat_1st_order( fwd_model, img)">system_mat_1st_order</a>(img);
+0043    E = s_mat.E;
+0044 
+0045    n_nodes = <a href="../../../eidors/models/num_nodes.html" class="code" title="function num = num_nodes( mdl );">num_nodes</a>(img);
+0046    <span class="keyword">if</span> ~isempty(new_c_list);
+0047       n_elecs = max([max(new_c_list(:,1:2)),<a href="../../../eidors/models/num_elecs.html" class="code" title="function num = num_elecs( mdl );">num_elecs</a>(img)]);
+0048    <span class="keyword">else</span>
+0049       n_elecs = <a href="../../../eidors/models/num_elecs.html" class="code" title="function num = num_elecs( mdl );">num_elecs</a>(img);
+0050    <span class="keyword">end</span>
+0051    n_max  = n_nodes + n_elecs; 
+0052    Eo = <a href="../../../eidors/overloads/sparse/sparse.html" class="code" title="function S = sparse(varargin)">sparse</a>(n_max, n_max);
+0053    Eo(1:size(E,1),1:size(E,2)) = E;
+0054    <span class="keyword">for</span> i=1:size(new_c_list,1);
+0055      x = new_c_list(i,1) + n_nodes;
+0056      y = new_c_list(i,2) + n_nodes;
+0057      c = new_c_list(i,3);
+0058      Eo(x,y) = Eo(x,y) - c;
+0059      Eo(y,x) = Eo(y,x) - c;
+0060      Eo(x,x) = Eo(x,x) + c;
+0061      Eo(y,y) = Eo(y,y) + c;
+0062    <span class="keyword">end</span>
+0063    
+0064    s_mat.E = Eo;
+0065 
+0066 <a name="_sub1" href="#_subfunctions" class="code">function do_unit_test</a>
+0067    <span class="comment">% Example from conference paper</span>
+0068    fmdl = <a href="../../../eidors/eidors_obj.html" class="code" title="function [obj_id, extra_out] = eidors_obj(type,name, varargin )">eidors_obj</a>(<span class="string">'fwd_model'</span>,<span class="string">'eg'</span>, <span class="keyword">...</span>
+0069        <span class="string">'nodes'</span>,[0,0;0,1;2,0;2,1], <span class="keyword">...</span>
+0070        <span class="string">'elems'</span>,[1,2,3;2,3,4], <span class="keyword">...</span>
+0071        <span class="string">'gnd_node'</span>,1);
+0072    fmdl = <a href="../../../eidors/models/mdl_normalize.html" class="code" title="function out = mdl_normalize(mdl, val)">mdl_normalize</a>(fmdl,1);
+0073    fmdl.system_mat = @<a href="../../../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>;
+0074    fmdl.solve      = @<a href="../../../eidors/tools/eidors_default.html" class="code" title="function varargout = eidors_default(varargin)">eidors_default</a>;
+0075    img = <a href="../../../eidors/models/mk_image.html" class="code" title="function img= mk_image(mdl, elem_data, params, name)">mk_image</a>(fmdl,[1,2]);
+0076    s_mat= <a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>(img); 
+0077    Eok= [ 5,-4,-1, 0;-4, 6, 0,-2;
+0078          -1, 0, 9,-8; 0,-2,-8,10]/4;
+0079    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'basic'</span>,s_mat.E,Eok);
+0080 
+0081    img.fwd_model.electrode = [ <span class="keyword">...</span>
+0082      struct(<span class="string">'nodes'</span>,[1,2],<span class="string">'z_contact'</span>,5/30), <span class="keyword">...</span>
+0083      struct(<span class="string">'nodes'</span>,[3,4],<span class="string">'z_contact'</span>,5/60)];
+0084    s_mat= <a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>(img); 
+0085 
+0086    Eok(:,5:6) = 0; Eok(5:6,:) = 0;
+0087    Eok = Eok + [ <span class="keyword">...</span>
+0088      2 1 0 0 -3 0; 1 2 0 0 -3 0;
+0089      0  0 4 2 0 -6; 0 0  2  4 0 -6
+0090     -3 -3 0 0 6  0; 0 0 -6 -6 0 12];
+0091    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'with CEM'</span>,s_mat.E,Eok,1e-13);
+0092 
+0093    img.fwd_model.stimulation = <span class="keyword">...</span>
+0094       <a href="../../../eidors/models/stim_meas_list.html" class="code" title="function [stim, meas_sel]= stim_meas_list( sp_mp , Nelec, current, gain);">stim_meas_list</a>([1,2,1,2]); 
+0095 
+0096    imgs = img; imgs.elem_data = [1;1];
+0097    vv= <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(imgs);
+0098    Ztest =  2+5/30+5/60;
+0099    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'CEM solve'</span>,vv.meas,Ztest,1e-13);
+0100 
+0101 <span class="comment">% NOTE: there is a bug in the paper,</span>
+0102 <span class="comment">% actually, the connection is to newEl</span>
+0103    NewElectrode = 3; <span class="comment">% add new electrode</span>
+0104    Y12 = 1/10; <span class="comment">% Y=1/10Ohms between E#1 and new electrode</span>
+0105    Y13 = 1/ 5; <span class="comment">% Y=1/ 5Ohms between E#1 and new elec</span>
+0106    c_list = [ 1,3,Y12;
+0107               2,NewElectrode,Y13];
+0108    <span class="comment">% Add instrument electrode</span>
+0109    img.fwd_model.electrode(NewElectrode) = <span class="keyword">...</span><span class="comment"> </span>
+0110        struct(<span class="string">'nodes'</span>,<span class="string">'instrument'</span>,<span class="string">'z_contact'</span>,NaN);
+0111    img.fwd_model.stimulation = <span class="keyword">...</span>
+0112       <a href="../../../eidors/models/stim_meas_list.html" class="code" title="function [stim, meas_sel]= stim_meas_list( sp_mp , Nelec, current, gain);">stim_meas_list</a>([1,3,1,3]); 
+0113 
+0114    img.fwd_model.system_mat = @<a href="system_mat_instrument.html" class="code" title="function s_mat = system_mat_instrument( img);">system_mat_instrument</a>;
+0115    img.fwd_model.system_mat_instrument.connect_list = c_list;
+0116    s_mat= <a href="../../../eidors/solvers/calc_system_mat.html" class="code" title="function system_mat = calc_system_mat( fwd_model, img)">calc_system_mat</a>(img); 
+0117 
+0118    Eok(:,7) = 0; Eok(7,:) = 0;
+0119    Eok = Eok + [ 0 0 0 0 0 0 0;
+0120 0 0 0 0   0   0   0; 0 0 0 0   0   0   0; 
+0121 0 0 0 0   0   0   0; 0 0 0 0  .1   0 -.1;
+0122 0 0 0 0   0  .2 -.2; 0 0 0 0 -.1 -.2  .3];
+0123    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'instrument'</span>,s_mat.E,Eok,1e-13);
+0124 
+0125    imgs = img; imgs.elem_data = [1;1];
+0126    vv= <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(imgs);
+0127    Ztest = 1/( Y12 + 1/(Ztest + 1/Y13));
+0128    
+0129    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'instrument solve1'</span>,vv.meas, Ztest,1e-13);
+0130 
+0131    <span class="comment">% apply current to ground</span>
+0132    imgs.fwd_model.stimulation = struct( <span class="keyword">...</span>
+0133       <span class="string">'stim_pattern'</span>,[1;0;NaN], <span class="keyword">...</span>
+0134       <span class="string">'volt_pattern'</span>,[0;0;0], <span class="keyword">...</span>
+0135       <span class="string">'meas_pattern'</span>,[1,0,-1;0,1,-1]);
+0136    vv= <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(imgs);
+0137    Ztest2 = 10/(7.25+10)*5;
+0138    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'instrument solve2'</span>,vv.meas, [Ztest;Ztest2],1e-13);
+0139 
+0140    <span class="comment">% apply voltage to ground</span>
+0141    imgs.fwd_model.stimulation = struct( <span class="keyword">...</span>
+0142       <span class="string">'stim_pattern'</span>,[NaN;0;NaN], <span class="keyword">...</span>
+0143       <span class="string">'volt_pattern'</span>,[10;0;0], <span class="keyword">...</span>
+0144       <span class="string">'meas_pattern'</span>,[1,0,-1;0,1,-1]);
+0145    vv= <a href="../../../eidors/solvers/fwd_solve.html" class="code" title="function data = fwd_solve(fwd_model, img)">fwd_solve</a>(imgs);
+0146    Ztest = 10*[1;5/7.25];
+0147    <a href="../../../eidors/tools/unit_test_cmp.html" class="code" title="function res = unit_test_cmp(txt,a,b,tol)">unit_test_cmp</a>(<span class="string">'instrument solve3'</span>,vv.meas, Ztest,1e-13);
+0148 
+0149 
+0150 <span class="comment">%  disp(Eok)</span>
+0151 <span class="comment">%  disp(full(s_mat.E))</span></pre></div>
+<hr><address>Generated on Fri 30-Dec-2022 20:46:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

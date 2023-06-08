@@ -12,7 +12,7 @@ ad5933-multiplexer
 #define START_FREQ  (1000)
 #define FREQ_INCR   (1000)
 #define NUM_INCR    (100)
-#define REF_RESIST  (550)
+#define REF_RESIST  (1000)
 #define SIZE (8) //number of electrodes
 
 int vect[SIZE];

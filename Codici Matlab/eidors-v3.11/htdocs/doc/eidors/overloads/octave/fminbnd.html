@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of fminbnd</title>
+  <meta name="keywords" content="fminbnd">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">eidors</a> &gt; <a href="../index.html">overloads</a> &gt; <a href="index.html">octave</a> &gt; fminbnd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/overloads/octave&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>fminbnd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="fminbnd.html" class="code" title="">fminbnd</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="../../../eidors/models/mk_GREIT_model.html" class="code" title="function [imdl, weight]= mk_GREIT_model( fmdl, radius, weight, options )">mk_GREIT_model</a>	MK_GREIT_MODEL: make EIDORS inverse models using the GREIT approach</li><li><a href="fminbnd.html" class="code" title="">fminbnd</a>	</li><li><a href="../../../eidors/solvers/inverse/inv_solve_diff_GN_one_step.html" class="code" title="function img= inv_solve_diff_GN_one_step( inv_model, data1, data2)">inv_solve_diff_GN_one_step</a>	INV_SOLVE_DIFF_GN_ONE_STEP inverse solver using approach of Adler&Guardo 1996</li><li><a href="../../../eidors/solvers/inverse/line_search_onm2.html" class="code" title="function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hps2RtR, hpt2LLt, dv0, opt, retry, pf_max)">line_search_onm2</a>	function  [alpha, img, dv, opt] = line_search_onm2(imgk, dx, data1, img1, N, W, hps2RtR, hpt2LLt, dv0, opt)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [x, fval, info, output] = fminbnd (fun, a, b, options = struct (), varargin = {})</a></li><li><a href="#_sub2" class="code">function fx = guarded_eval (fun, x)</a></li><li><a href="#_sub3" class="code">function print_formatted_table (table)</a></li><li><a href="#_sub4" class="code">function print_exit_msg (info, opt=struct ())</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 ########################################################################
+0002 ##
+0003 ## Copyright (C) 2008-2022 The Octave Project Developers
+0004 ##
+0005 ## See the file COPYRIGHT.md in the top-level directory of this
+0006 ## distribution or &lt;https://octave.org/copyright/&gt;.
+0007 ##
+0008 ## This file is part of Octave.
+0009 ##
+0010 ## Octave is free software: you can redistribute it and/or modify it
+0011 ## under the terms of the GNU General Public License as published by
+0012 ## the Free Software Foundation, either version 3 of the License, or
+0013 ## (at your option) any later version.
+0014 ##
+0015 ## Octave is distributed in the hope that it will be useful, but
+0016 ## WITHOUT ANY WARRANTY; without even the implied warranty of
+0017 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+0018 ## GNU General Public License <span class="keyword">for</span> more details.
+0019 ##
+0020 ## You should have received a copy of the GNU General Public License
+0021 ## along with Octave; see the file COPYING.  If not, see
+0022 ## &lt;https://www.gnu.org/licenses/&gt;.
+0023 ##
+0024 ########################################################################
+0025 
+0026 ## -*- texinfo -*-
+0027 ## @deftypefn  {} {@var{x} =} <a href="fminbnd.html" class="code" title="">fminbnd</a> (@var{fun}, @var{a}, @var{b})
+0028 ## @deftypefnx {} {@var{x} =} <a href="fminbnd.html" class="code" title="">fminbnd</a> (@var{fun}, @var{a}, @var{b}, @var{options})
+0029 ## @deftypefnx {} {[@var{x}, @var{fval}, @var{info}, @var{output}] =} <a href="fminbnd.html" class="code" title="">fminbnd</a> (@dots{})
+0030 ## Find a minimum point of a univariate function.
+0031 ##
+0032 ## @var{fun} is a <span class="keyword">function</span> handle, inline <span class="keyword">function</span>, or string containing the
+0033 ## name of the <span class="keyword">function</span> to evaluate.
+0034 ##
+0035 ## The starting interval is specified by @var{a} (left boundary) and @var{b}
+0036 ## (right boundary).  The endpoints must be finite.
+0037 ##
+0038 ## @var{options} is a structure specifying additional parameters which
+0039 ## control the algorithm.  Currently, @code{<a href="fminbnd.html" class="code" title="">fminbnd</a>} recognizes these options:
+0040 ## @qcode{&quot;Display&quot;}, @qcode{&quot;FunValCheck&quot;}, @qcode{&quot;MaxFunEvals&quot;},
+0041 ## @qcode{&quot;MaxIter&quot;}, @qcode{&quot;OutputFcn&quot;}, @qcode{&quot;TolX&quot;}.
+0042 ##
+0043 ## @qcode{&quot;MaxFunEvals&quot;} proscribes the maximum number of <span class="keyword">function</span> evaluations
+0044 ## before optimization is halted.  The default value is 500.
+0045 ## The value must be a positive integer.
+0046 ##
+0047 ## @qcode{&quot;MaxIter&quot;} proscribes the maximum number of algorithm iterations
+0048 ## before optimization is halted.  The default value is 500.
+0049 ## The value must be a positive integer.
+0050 ##
+0051 ## @qcode{&quot;TolX&quot;} specifies the termination tolerance <span class="keyword">for</span> the solution @var{x}.
+0052 ## The default is @code{1e-4}.
+0053 ##
+0054 ## For a description of the other options,
+0055 ## @pxref{XREFoptimset,,@code{optimset}}.
+0056 ## To initialize an options structure with default values <span class="keyword">for</span> @code{<a href="fminbnd.html" class="code" title="">fminbnd</a>}
+0057 ## use @code{options = optimset (&quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>&quot;)}.
+0058 ##
+0059 ## On exit, the <span class="keyword">function</span> returns @var{x}, the approximate minimum point, and
+0060 ## @var{fval}, the <span class="keyword">function</span> evaluated @var{x}.
+0061 ##
+0062 ## The third output @var{info} reports whether the algorithm succeeded and may
+0063 ## take one of the following values:
+0064 ##
+0065 ## @itemize
+0066 ## @item 1
+0067 ## The algorithm converged to a solution.
+0068 ##
+0069 ## @item 0
+0070 ## Iteration limit (either @code{MaxIter} or @code{MaxFunEvals}) exceeded.
+0071 ##
+0072 ## @item -1
+0073 ## The algorithm was terminated by a user @code{OutputFcn}.
+0074 ## @end itemize
+0075 ##
+0076 ## Programming Notes: The search <span class="keyword">for</span> a minimum is restricted to be in the
+0077 ## finite interval bound by @var{a} and @var{b}.  If you have only one initial
+0078 ## point to begin searching from then you will need to use an unconstrained
+0079 ## minimization algorithm such as @code{fminunc} or @code{fminsearch}.
+0080 ## @code{<a href="fminbnd.html" class="code" title="">fminbnd</a>} internally uses a Golden Section search strategy.
+0081 ## @seealso{fzero, fminunc, fminsearch, optimset}
+0082 ## @end deftypefn
+0083 
+0084 ## This is patterned after opt/fmin.f from Netlib, which in turn is taken from
+0085 ## Richard Brent: Algorithms For Minimization Without Derivatives,
+0086 ## Prentice-Hall (1973)
+0087 
+0088 ## PKG_ADD: ## Discard result to avoid polluting workspace with ans at startup.
+0089 ## PKG_ADD: [~] = __all_opts__ (&quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>&quot;);
+0090 
+0091 ## Added ability to pass extra params to fn
+0092 ## A Adler, Dec 2022
+0093 
+0094 <a name="_sub0" href="#_subfunctions" class="code">function [x, fval, info, output] = fminbnd (fun, a, b, options = struct (), varargin = {})</a>
+0095 
+0096   ## Get default options <span class="keyword">if</span> requested.
+0097   <span class="keyword">if</span> (nargin == 1 &amp;&amp; ischar (fun) &amp;&amp; strcmp (fun, &quot;defaults&quot;))
+0098     x = <a href="#_sub4" class="code" title="subfunction print_exit_msg (info, opt=struct ())">struct</a> (&quot;Display&quot;, &quot;notify&quot;, &quot;FunValCheck&quot;, &quot;off&quot;,
+0099                 &quot;MaxFunEvals&quot;, 500, &quot;MaxIter&quot;, 500,
+0100                 &quot;OutputFcn&quot;, [], &quot;TolX&quot;, 1e-4);
+0101     <span class="keyword">return</span>;
+0102   endif
+0103 
+0104   <span class="keyword">if</span> (nargin &lt; 2)
+0105     print_usage ();
+0106   endif
+0107 
+0108   <span class="keyword">if</span> (a &gt; b)
+0109     error (&quot;Octave:invalid-input-arg&quot;,
+0110            &quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>: the lower bound cannot be greater than the upper one&quot;);
+0111   endif
+0112 
+0113   <span class="keyword">if</span> (ischar (fun))
+0114     fun = str2func (fun);
+0115   endif
+0116 
+0117   displ = optimget (options, &quot;Display&quot;, &quot;notify&quot;);
+0118   funvalchk = strcmpi (optimget (options, &quot;FunValCheck&quot;, &quot;off&quot;), &quot;on&quot;);
+0119   outfcn = optimget (options, &quot;OutputFcn&quot;);
+0120   tolx = optimget (options, &quot;TolX&quot;, 1e-4);
+0121   maxiter = optimget (options, &quot;MaxIter&quot;, 500);
+0122   maxfev = optimget (options, &quot;MaxFunEvals&quot;, 500);
+0123 
+0124   <span class="keyword">if</span> (funvalchk)
+0125     ## Replace fun with a guarded version.
+0126     fun = @(x) <a href="#_sub2" class="code" title="subfunction fx = guarded_eval (fun, x)">guarded_eval</a> (fun, x, varargin{:});
+0127   endif
+0128 
+0129   ## The default exit flag <span class="keyword">if</span> exceeded number of iterations.
+0130   info = 0;
+0131   niter = 0;
+0132   nfev = 0;
+0133 
+0134   c = 0.5*(3 - sqrt (5));
+0135   v = a + c*(b-a);
+0136   w = x = v;
+0137   e = 0;
+0138   fv = fw = fval = fun (x, varargin{:});
+0139   nfev += 1;
+0140 
+0141   <span class="keyword">if</span> (isa (a, &quot;single&quot;) || isa (b, &quot;single&quot;) || isa (fval, &quot;single&quot;))
+0142     sqrteps = eps (&quot;single&quot;);
+0143   <span class="keyword">else</span>
+0144     sqrteps = eps (&quot;double&quot;);
+0145   endif
+0146 
+0147   ## Only <span class="keyword">for</span> display purposes.
+0148   iter(1).funccount = nfev;
+0149   iter(1).x = x;
+0150   iter(1).fx = fval;
+0151 
+0152   <span class="keyword">while</span> (niter &lt; maxiter &amp;&amp; nfev &lt; maxfev)
+0153     xm = 0.5*(a+b);
+0154     ## FIXME: the golden section search can actually get closer than sqrt(eps)
+0155     ## sometimes.  Sometimes not, it depends on the function.  This is the
+0156     ## strategy from the Netlib code.  Something smarter would be good.
+0157     tol = 2 * sqrteps * abs (x) + tolx / 3;
+0158     <span class="keyword">if</span> (abs (x - xm) &lt;= (2*tol - 0.5*(b-a)))
+0159       info = 1;
+0160       <span class="keyword">break</span>;
+0161     endif
+0162 
+0163     <span class="keyword">if</span> (abs (e) &gt; tol)
+0164       dogs = false;
+0165       ## Try inverse parabolic step.
+0166       iter(niter+1).procedure = &quot;parabolic&quot;;
+0167 
+0168       r = (x - w)*(fval - fv);
+0169       q = (x - v)*(fval - fw);
+0170       p = (x - v)*q - (x - w)*r;
+0171       q = 2*(q - r);
+0172       p *= -sign (q);
+0173       q = abs (q);
+0174       r = e;
+0175       e = d;
+0176 
+0177       <span class="keyword">if</span> (abs (p) &lt; abs (0.5*q*r) &amp;&amp; p &gt; q*(a-x) &amp;&amp; p &lt; q*(b-x))
+0178         ## The parabolic step is acceptable.
+0179         d = p / q;
+0180         u = x + d;
+0181 
+0182         ## f must not be evaluated too close to ax or bx.
+0183         <span class="keyword">if</span> (min (u-a, b-u) &lt; 2*tol)
+0184           d = tol * (sign (xm - x) + (xm == x));
+0185         endif
+0186       <span class="keyword">else</span>
+0187         dogs = true;
+0188       endif
+0189     <span class="keyword">else</span>
+0190       dogs = true;
+0191     endif
+0192     <span class="keyword">if</span> (dogs)
+0193       ## Default to golden section step.
+0194 
+0195       ## WARNING: This is also the &quot;initial&quot; procedure following MATLAB
+0196       ## nomenclature.  After the loop we'll fix the string <span class="keyword">for</span> the first step.
+0197       iter(niter+1).procedure = &quot;golden&quot;;
+0198 
+0199       e = ifelse (x &gt;= xm, a - x, b - x);
+0200       d = c * e;
+0201     endif
+0202 
+0203     ## f must not be evaluated too close to x.
+0204     u = x + max (abs (d), tol) * (sign (d) + (d == 0));
+0205     fu = fun (u, varargin{:});
+0206 
+0207     niter += 1;
+0208 
+0209     iter(niter).funccount = nfev++;
+0210     iter(niter).x = u;
+0211     iter(niter).fx = fu;
+0212 
+0213     ## update a, b, v, w, and x
+0214 
+0215     <span class="keyword">if</span> (fu &lt; fval)
+0216       <span class="keyword">if</span> (u &lt; x)
+0217         b = x;
+0218       <span class="keyword">else</span>
+0219         a = x;
+0220       endif
+0221       v = w; fv = fw;
+0222       w = x; fw = fval;
+0223       x = u; fval = fu;
+0224     <span class="keyword">else</span>
+0225       ## The following <span class="keyword">if</span>-statement was originally executed even <span class="keyword">if</span> fu == fval.
+0226       <span class="keyword">if</span> (u &lt; x)
+0227         a = u;
+0228       <span class="keyword">else</span>
+0229         b = u;
+0230       endif
+0231       <span class="keyword">if</span> (fu &lt;= fw || w == x)
+0232         v = w; fv = fw;
+0233         w = u; fw = fu;
+0234       <span class="keyword">elseif</span> (fu &lt;= fv || v == x || v == w)
+0235         v = u;
+0236         fv = fu;
+0237       endif
+0238     endif
+0239 
+0240     ## If there's an output <span class="keyword">function</span>, use it now.
+0241     <span class="keyword">if</span> (! isempty (outfcn))
+0242       optv.funccount = nfev;
+0243       optv.fval = fval;
+0244       optv.iteration = niter;
+0245       <span class="keyword">if</span> (outfcn (x, optv, &quot;iter&quot;))
+0246         info = -1;
+0247         <span class="keyword">break</span>;
+0248       endif
+0249     endif
+0250   endwhile
+0251 
+0252   ## Fix the first step procedure.
+0253   iter(1).procedure = &quot;initial&quot;;
+0254 
+0255   ## Handle the &quot;Display&quot; option
+0256   <span class="keyword">switch</span> (displ)
+0257     <span class="keyword">case</span> &quot;iter&quot;
+0258       <a href="#_sub3" class="code" title="subfunction print_formatted_table (table)">print_formatted_table</a> (iter);
+0259       print_exit_msg (info, <a href="#_sub4" class="code" title="subfunction print_exit_msg (info, opt=struct ())">struct</a> (&quot;TolX&quot;, tolx, &quot;fx&quot;, fval));
+0260     <span class="keyword">case</span> &quot;notify&quot;
+0261       <span class="keyword">if</span> (info == 0)
+0262         print_exit_msg (info, <a href="#_sub4" class="code" title="subfunction print_exit_msg (info, opt=struct ())">struct</a> (&quot;fx&quot;,fval));
+0263       endif
+0264     <span class="keyword">case</span> &quot;final&quot;
+0265       print_exit_msg (info, <a href="#_sub4" class="code" title="subfunction print_exit_msg (info, opt=struct ())">struct</a> (&quot;TolX&quot;, tolx, &quot;fx&quot;, fval));
+0266     <span class="keyword">case</span> &quot;off&quot;
+0267       &quot;skip&quot;;
+0268     <span class="keyword">otherwise</span>
+0269       warning (&quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>: unknown option <span class="keyword">for</span> Display: <span class="string">'%s'</span>&quot;, displ);
+0270   endswitch
+0271 
+0272   output.iterations = niter;
+0273   output.funcCount = nfev;
+0274   output.algorithm = &quot;golden section search, parabolic interpolation&quot;;
+0275   output.bracket = [a, b];
+0276   ## FIXME: bracketf possibly unavailable.
+0277 
+0278 endfunction
+0279 
+0280 ## A helper <span class="keyword">function</span> that evaluates a <span class="keyword">function</span> and checks <span class="keyword">for</span> bad results.
+0281 <a name="_sub1" href="#_subfunctions" class="code">function fx = guarded_eval (fun, x)</a>
+0282 
+0283   fx = fun (x);
+0284   fx = fx(1);
+0285   <span class="keyword">if</span> (! isreal (fx))
+0286     error (&quot;Octave:fmindbnd:notreal&quot;, &quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>: non-real value encountered&quot;);
+0287   <span class="keyword">elseif</span> (isnan (fx))
+0288     error (&quot;Octave:fmindbnd:isnan&quot;, &quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>: NaN value encountered&quot;);
+0289   endif
+0290 
+0291 endfunction
+0292 
+0293 ## A hack <span class="keyword">for</span> printing a formatted table
+0294 <a name="_sub2" href="#_subfunctions" class="code">function print_formatted_table (table)</a>
+0295   printf (&quot;\n Func-count     x          f(x)         Procedure\n&quot;);
+0296   <span class="keyword">for</span> row=table
+0297     printf (&quot;<span class="comment">%5.5s        %7.7s    %8.8s\t%s\n&quot;,</span>
+0298             int2str (row.funccount), num2str (row.x,&quot;<span class="comment">%.5f&quot;),</span>
+0299             num2str (row.fx,&quot;<span class="comment">%.6f&quot;), row.procedure);</span>
+0300   endfor
+0301   printf (&quot;\n&quot;);
+0302 endfunction
+0303 
+0304 ## Print either a success termination message or bad news
+0305 <a name="_sub3" href="#_subfunctions" class="code">function print_exit_msg (info, opt=struct ())</a>
+0306 
+0307   printf (&quot;&quot;);
+0308   <span class="keyword">switch</span> (info)
+0309     <span class="keyword">case</span> 1
+0310       printf (&quot;Optimization terminated:\n&quot;);
+0311       printf (&quot; the current x satisfies the termination criteria using OPTIONS.TolX of <span class="comment">%e\n&quot;, opt.TolX);</span>
+0312     <span class="keyword">case</span> 0
+0313       printf (&quot;Exiting: Maximum number of iterations has been exceeded\n&quot;);
+0314       printf (&quot;         - increase MaxIter option.\n&quot;);
+0315       printf (&quot;         Current <span class="keyword">function</span> value: <span class="comment">%.6f\n&quot;, opt.fx);</span>
+0316     <span class="keyword">case</span> -1
+0317       &quot;FIXME&quot;; # FIXME: what's the message MATLAB prints <span class="keyword">for</span> this case?
+0318     <span class="keyword">otherwise</span>
+0319       error (&quot;<a href="fminbnd.html" class="code" title="">fminbnd</a>: internal error, info <span class="keyword">return</span> code was <span class="comment">%d&quot;, info);</span>
+0320   endswitch
+0321   printf (&quot;\n&quot;);
+0322 
+0323 endfunction
+0324 
+0325 
+0326 <span class="comment">%!shared opt0</span>
+0327 <span class="comment">%! opt0 = optimset (&quot;tolx&quot;, 0);</span>
+0328 <span class="comment">%!assert (fminbnd (@cos, pi/2, 3*pi/2, opt0), pi, 10*sqrt (eps))</span>
+0329 <span class="comment">%!assert (fminbnd (@(x) (x - 1e-3)^4, -1, 1, opt0), 1e-3, 10e-3*sqrt (eps))</span>
+0330 <span class="comment">%!assert (fminbnd (@(x) abs (x-1e7), 0, 1e10, opt0), 1e7, 10e7*sqrt (eps))</span>
+0331 <span class="comment">%!assert (fminbnd (@(x) x^2 + sin (2*pi*x), 0.4, 1, opt0), fzero (@(x) 2*x + 2*pi*cos (2*pi*x), [0.4, 1], opt0), sqrt (eps))</span>
+0332 <span class="comment">%!assert (fminbnd (@(x) x &gt; 0.3, 0, 1) &lt; 0.3)</span>
+0333 <span class="comment">%!assert (fminbnd (@(x) sin (x), 0, 0), 0, eps)</span>
+0334 
+0335 <span class="comment">%!error &lt;lower bound cannot be greater&gt; fminbnd (@(x) sin (x), 0, -pi)</span></pre></div>
+<hr><address>Generated on Fri 30-Dec-2022 20:46:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gmsh_stl2tet</title>
+  <meta name="keywords" content="gmsh_stl2tet">
+  <meta name="description" content="GMSH_STL2TET creates a tetrahedral mesh from an stl file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="../index.html">eidors</a> &gt; <a href="index.html">models</a> &gt; gmsh_stl2tet.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for eidors/models&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>gmsh_stl2tet
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GMSH_STL2TET creates a tetrahedral mesh from an stl file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function mdl = gmsh_stl2tet(stlfile, maxh, extra) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GMSH_STL2TET creates a tetrahedral mesh from an stl file
+ mdl = gmsh_stl2tet(stlfile, maxh, extra) where:
+        mdl - EIDORS fwd_model struct
+    stlfile - either:
+                 - a path to an stl file
+               OR
+                 - a struct with .vertices and .faces 
+       maxh - maximum edge length (default: coarse mesh)
+      extra - extra command line options to gmsh
+
+ If stlfile is a struct, stl_write will be called first and an STL file
+ written in a temporary location. 
+
+ CASHING: Calls are cashed iff stlfile is a struct.
+
+ NOTE: Only one surface per file is allowed.
+
+ See also CALL_GMSH, STL_WRITE</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../eidors/meshing/gmsh/call_gmsh.html" class="code" title="function status= call_gmsh(geo_file, dim,extra)">call_gmsh</a>	call_gmsh: call Gmsh to create a vol_file from a geo_file</li><li><a href="../../eidors/meshing/gmsh/gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>	GMSH_MK_FWD_MODEL: create a fwd_model object from a Gmsh file</li><li><a href="../../eidors/meshing/stl/stl_write.html" class="code" title="function stl_write(fv, name)">stl_write</a>	STL_WRITE Create a text STL file from a patch struct</li><li><a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>	EIDORS_CACHE Control eidors caching</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="place_elec_on_surf.html" class="code" title="function mdl2 = place_elec_on_surf(mdl,elec_pos, elec_spec,ng_opt_file, maxh)">place_elec_on_surf</a>	PLACE_ELEC_ON_SURF Place electrodes on the surface of a model</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function mdl = do_gmsh_stl2tet(stlfile, extra)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function mdl = gmsh_stl2tet(stlfile, maxh, extra)</a>
+0002 <span class="comment">%GMSH_STL2TET creates a tetrahedral mesh from an stl file</span>
+0003 <span class="comment">% mdl = gmsh_stl2tet(stlfile, maxh, extra) where:</span>
+0004 <span class="comment">%        mdl - EIDORS fwd_model struct</span>
+0005 <span class="comment">%    stlfile - either:</span>
+0006 <span class="comment">%                 - a path to an stl file</span>
+0007 <span class="comment">%               OR</span>
+0008 <span class="comment">%                 - a struct with .vertices and .faces</span>
+0009 <span class="comment">%       maxh - maximum edge length (default: coarse mesh)</span>
+0010 <span class="comment">%      extra - extra command line options to gmsh</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% If stlfile is a struct, stl_write will be called first and an STL file</span>
+0013 <span class="comment">% written in a temporary location.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% CASHING: Calls are cashed iff stlfile is a struct.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% NOTE: Only one surface per file is allowed.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% See also CALL_GMSH, STL_WRITE</span>
+0020 
+0021 <span class="comment">% (C) Bartlomiej Grychtol, 2012-2021.</span>
+0022 <span class="comment">% $Id: gmsh_stl2tet.m 6276 2022-04-07 07:41:51Z bgrychtol $</span>
+0023 
+0024 <span class="keyword">if</span> nargin &lt; 3
+0025    extra = [];
+0026 <span class="keyword">end</span>
+0027 <span class="keyword">if</span> nargin &gt; 1 &amp;&amp; ~isempty(maxh)
+0028    extra = [<span class="string">' -clmax '</span> num2str(maxh), <span class="string">' '</span>, extra];
+0029 <span class="keyword">end</span>
+0030 
+0031 <span class="keyword">if</span> isstruct(stlfile)
+0032     opt.cache_obj = {stlfile.vertices, stlfile.faces};
+0033     mdl = <a href="../../eidors/tools/eidors_cache.html" class="code" title="function varargout=eidors_cache( command, varargin )">eidors_cache</a>(@<a href="#_sub1" class="code" title="subfunction mdl = do_gmsh_stl2tet(stlfile, extra)">do_gmsh_stl2tet</a>,{stlfile, extra}, opt);
+0034 <span class="keyword">else</span>
+0035     mdl = <a href="#_sub1" class="code" title="subfunction mdl = do_gmsh_stl2tet(stlfile, extra)">do_gmsh_stl2tet</a>(stlfile, extra);
+0036 <span class="keyword">end</span>
+0037 
+0038 
+0039 
+0040 <a name="_sub1" href="#_subfunctions" class="code">function mdl = do_gmsh_stl2tet(stlfile, extra)</a>
+0041 <span class="keyword">if</span> isstruct(stlfile)
+0042     stem = tempname;
+0043     <a href="../../eidors/meshing/stl/stl_write.html" class="code" title="function stl_write(fv, name)">stl_write</a>(stlfile, [stem, <span class="string">'.stl'</span>])
+0044     stlname = [stem <span class="string">'.stl'</span>];
+0045 <span class="keyword">else</span>
+0046     stem = strrep(stlfile,<span class="string">'.stl'</span>,<span class="string">''</span>);
+0047     stlname = stlfile;
+0048 <span class="keyword">end</span>
+0049 <span class="comment">%TODO: Some of this could be exposed as options (Algorithm, Optimize, ...)</span>
+0050 fid = fopen([stem <span class="string">'.geo'</span>],<span class="string">'w'</span>);
+0051 fprintf(fid,<span class="string">'Merge &quot;%s&quot;;\n'</span>,stlname);
+0052 fprintf(fid,<span class="string">'Surface Loop(1) = {1};\n'</span>);
+0053 fprintf(fid,<span class="string">'Volume(2) = {1};\n'</span>);
+0054 fprintf(fid,<span class="string">'Physical Volume(3) = {2};\n'</span>);
+0055 fprintf(fid,<span class="string">'Mesh.Algorithm3D=4;\n'</span>); <span class="comment">%1=delaunay (tetgen) and 4=frontal (netgen)</span>
+0056 fprintf(fid,<span class="string">'Mesh.OptimizeNetgen=1;\n'</span>);
+0057 fclose(fid);
+0058 
+0059 <a href="../../eidors/meshing/gmsh/call_gmsh.html" class="code" title="function status= call_gmsh(geo_file, dim,extra)">call_gmsh</a>([stem <span class="string">'.geo'</span>], 3, extra);
+0060 
+0061 mdl = <a href="../../eidors/meshing/gmsh/gmsh_mk_fwd_model.html" class="code" title="function [fwd_mdl, mat_indices]=gmsh_mk_fwd_model( vol_filename, name, eprefix,stim_pattern, z_contact)">gmsh_mk_fwd_model</a>([stem <span class="string">'.msh'</span>],[],[],[]);
+0062 
+0063 delete([stem <span class="string">'.geo'</span>]);
+0064 delete([stem <span class="string">'.msh'</span>]);
+0065 <span class="keyword">if</span> isstruct(stlfile)
+0066     delete(stlname);
+0067 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 30-Dec-2022 20:46:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

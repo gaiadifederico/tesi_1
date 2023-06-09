@@ -1,3 +1,4 @@
+from __future__ import division, absolute_import, print_function
 import sys
 import pandas as pd
 import time
@@ -11,7 +12,6 @@ from time import sleep
 import pyqtgraph as pg
 from pyqtgraph import PlotWidget
 from scipy.signal import butter, lfilter, freqs, find_peaks, hilbert, chirp
-import math
 from sklearn.preprocessing import StandardScaler
 import os
 from PyQt5 import QtGui
@@ -19,7 +19,16 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThreadPool, QRunnable, pyqtSl
 from PyQt5.QtWidgets import (
     QApplication, QLabel,QStyle,QTextEdit,QMainWindow,QPushButton,QVBoxLayout,QWidget,QHBoxLayout,QComboBox,QHBoxLayout,QTabWidget,QCheckBox, QMessageBox, QLineEdit, QFileDialog,QSpinBox,QButtonGroup,QAbstractButton
 )
-from binary_fractions import TwosComplement
+
+import matplotlib.pyplot as plt
+import pyeit.mesh as mesh
+from pyeit.eit.fem import EITForward
+import pyeit.eit.protocol as protocol
+from pyeit.mesh.shape import thorax
+import pyeit.eit.greit as greit
+from pyeit.mesh.wrapper import PyEITAnomaly_Circle
+from pyeit.eit.interp2d import sim2pts
+import pyeit.eit.jac as jac
 
 #VARIABILI GLOBALI
 CONN_STATUS =False #stato connessione porta
@@ -110,9 +119,38 @@ class SerialWorker(QRunnable):
             logging.info("Killing the process")
 
 
+################# 
+# RICEZIONE DATI#
+#################
+class WorkerSignals(QObject): 
+    #finished = pyqtSignal()
+    raw_data = pyqtSignal(np.ndarray)
+    
+class WorkerRX(QRunnable):
+    def __init__(self):
+        super().__init__()
+        self.signals = WorkerSignals()
+            
+    @pyqtSlot() 
+    def run(self):
+        global RX_DATA
+        global PORTA_SERIALE
 
+        #self.timer_acquisition.start(1000)
 
-'''MAIN WINDOW'''
+        
+        while RX_DATA:
+            if PORTA_SERIALE.in_waiting>159 :
+                dataArray = PORTA_SERIALE.read(160)
+                dataArray = struct.unpack('40f',dataArray)
+                dataArray = np.asarray(dataArray,dtype=np.float32)
+                self.signals.raw_data.emit(dataArray)
+                #self.signals.finished.emit()
+                RX_DATA=False
+
+################# 
+#  MAIN WINDOW  #
+#################
 class Window(QMainWindow):  
       
     def __init__(self):
@@ -379,6 +417,10 @@ class Window(QMainWindow):
         self.setCentralWidget(self.tabs)
         self.tabs.setCurrentIndex(0)
 
+        #DATA
+        self.stringa =""
+        self.raw_data_tot=np.empty(0, dtype=np.float32)
+
         #INITIAL SETUP
         #self.tabs.setTabEnabled(2,False)
         #self.tabs.setTabEnabled(3,False)
@@ -524,7 +566,6 @@ class Window(QMainWindow):
             self.serial_worker.signals.device_port.connect(self.connected_device)
             # execute the worker
             self.threadpool.start(self.serial_worker)
-            #self.serial_worker.signals.setup.connect(self.print_EEPROM_setup)
             self.com_list_widget.setDisabled(True)
             self.box_protocol.setEnabled(True)
             self.box_electrodes.setEnabled(True)
@@ -549,6 +590,7 @@ class Window(QMainWindow):
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
             #self.timer.stop()
             self.timer_acquisition.stop()
+            self.acquisition_time=0
             RX_DATA = False
             self.com_list_widget.show()
             #self.acquisition_time = 0
@@ -621,15 +663,20 @@ class Window(QMainWindow):
             self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
             self.layout_parameters.setEnabled(True)
             self.timer_acquisition.stop()
+            self.acquisition_time=0
             self.text_time.setText("00:00")
             #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
 
     def stop_transmission(self):
+        """!
+        @brief Stop the transmission of data
+        """
         self.transmit_btn.setText("Perform frequency sweep")
         self.transmit_btn.setStyleSheet("background-color: rgb(51,255,51);")
         #self.transmit_btn.setIcon(QtGui.QIcon('bluetooth (2).png'))
         #self.timer.stop()
         self.timer_acquisition.stop()
+        self.acquisition_time=0
         self.text_time.setText("00:00")
         #PORTA_SERIALE.write(b's')
         RX_DATA = False
@@ -639,66 +686,22 @@ class Window(QMainWindow):
         #self.new_acquisition_btn.setEnabled(True)
 
     def start_transmission(self): 
+        """!
+        @brief Start the transmission of data
+        """
         global RX_DATA
         global PORTA_SERIALE
         self.export_file_btn.setEnabled(True) 
-        #if(self.eit_modality==0):
-        #    PORTA_SERIALE.write(b'f') #'a' interpretata da arduino come fEIT
-        #else:
-        #    PORTA_SERIALE.write(b't') #'b' interpretata da arduino come tdEIT
-        #time.sleep(1)
-        self.timer_acquisition.start(1000)
-        PORTA_SERIALE.write(b'a')
+        PORTA_SERIALE.write(b'a') #invio dati
         time.sleep(1)
         RX_DATA = True
-        #Start the thread for the reception of data from arduino
-        #self.rx_worker = WorkerRXCOM() #prima dichiaro rx_worker e subito dopo connetto i segnali
-        #self.threadpool.start(self.rx_worker) #start threadpool
-        #self.rx_worker.signals.dati_accelerazione.connect(self.display_raw_data)
-        #self.rx_worker.signals.dati_accelerazione.connect(self.raw_data_plot)
-        #
-        #self.timer.start(int(self.time_interval)*1000)
-        
-        #now = QDateTime.currentDateTime()
-        #self.time_stamp = now.toString("dd-MM-yyyy_HH-mm-ss")
-        #print(self.time_stamp)
-        #self.num = 0
-        #self.minutes = 0
-        #self.statistics_btn.setEnabled(False) #disabilito il pulsante che verrà abilitato una volta conclusa la trasmissione
-        #self.new_acquisition_btn_rx.setEnabled(False)
-        #self.new_acquisition_btn.setEnabled(False)
-        #self.tabs.setTabEnabled(2,False)
-        #while RX_DATA:
-        #if PORTA_SERIALE.in_waiting>343 :
-        dataArray = PORTA_SERIALE.read(164)
-        dataArray = struct.unpack('164B',dataArray)
-        dataArray = np.asarray(dataArray,dtype=np.uint8)
-        lastIndex = len(dataArray)-1
-        #if dataArray[0]==10 and dataArray[lastIndex]==11: #10 = 0A, 11 = 0B
-        #imp_data=dataArray[1:171]
-        print("Bytes ricevuti: {}\nNumero bytes ricevuti: {}".format(dataArray, len(dataArray)))
-        #print(len(dataArray))
-        #RX_DATA=False
-        #else:
-        #    RX_DATA=False
-        #    print("Wrong header")
-        dataFloat = struct.unpack('41f',dataArray)
-        dataFloat = np.asarray(dataFloat,dtype=np.float32)
-        stringa = "Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat))
+        #Start il thread
+        self.rx_worker = WorkerRX() 
+        self.threadpool.start(self.rx_worker) #start threadpool
+        self.rx_worker.signals.raw_data.connect(self.display_raw_data)
+        #self.raw_data_tot = np.append(self.raw_data_tot)
 
-        #dataArray = dataArray.tolist()
-        #for x in dataArray,:
-        #    dataArray[x:x+4]
-        #dataFloat=TwosComplement.to_float(dataArray)   
-        #print("Dati ricevuti: {}\nNumero dati ricevuti: {}".format(dataFloat, len(dataFloat)))
-    
-        #Data = np.full(41,0,dtype=np.float32)
-        #for i in range(41):
-        #    Data[i] = (((dataArray[i*4] & 0xFF)<<24) | ((dataArray[i*4+1] & 0xFF)<<16)|((dataArray[i*4+2] & 0xFF)<<8)|((dataArray[i*4+3] & 0xFF)))
-        #stringa = "Dati ricevuti: {}\nNumero dati ricevuti: {}".format(Data, len(Data))
-
-        self.TestoRX.setText(stringa)
-        print("Finished!")
+        self.timer_acquisition.start(1000)
 
 
 
@@ -735,10 +738,75 @@ class Window(QMainWindow):
         self.tabs.setCurrentIndex(1)
     
     def display_time(self):
-            self.acquisition_time += 1 
-            minutes = int(self.acquisition_time/60)
-            seconds = int(self.acquisition_time%60)
-            self.text_time.setText("{:02d}:{:02d}".format(minutes, seconds))
+        self.acquisition_time += 1 
+        minutes = int(self.acquisition_time/60)
+        seconds = int(self.acquisition_time%60)
+        self.text_time.setText("{:02d}:{:02d}".format(minutes, seconds))
+
+    def display_raw_data(self, raw_data):
+        for i in range(len(raw_data)):
+            self.stringa += "{},".format(raw_data[i])
+        self.stringa +="\n"
+        self.TestoRX.setText(self.stringa)
+        self.raw_data_tot = np.append(self.raw_data_tot, raw_data)
+        print(self.raw_data_tot.shape)
+        if(len(self.raw_data_tot)>79):
+            self.raw_data_img()
+
+
+    def raw_data_img(self):
+        #if algoritmo==GREIT ...
+        v0=np.ndarray(40)
+        v1=np.ndarray(40)
+        #print((self.raw_data_tot.shape()))
+        for i in range(0,len(v0)):
+            v0[i]=self.raw_data_tot[i]
+            v1[i]=self.raw_data_tot[-(40-i)]
+        print(v0)
+        #print(self.raw_data_tot[-(80+i)])
+        n_el = 8  # nb of electrodes
+        use_customize_shape = False
+        if use_customize_shape:
+            # Mesh shape is specified with fd parameter in the instantiation, e.g : fd=thorax
+            mesh_obj = mesh.create(n_el, h0=0.1, fd=thorax)
+        else:
+            mesh_obj = mesh.create(n_el, h0=0.1)
+        el_pos = mesh_obj.el_pos
+        # extract node, element, alpha
+        pts = mesh_obj.node
+        tri = mesh_obj.element
+        x, y = pts[:, 0], pts[:, 1]
+        protocol_obj = protocol.create(n_el, dist_exc=1, step_meas=1, parser_meas="std")
+
+        #JAC
+        #eit = jac.JAC(mesh_obj, protocol_obj)
+        #eit.setup(p=0.5, lamb=0.01, method="kotre", perm=1, jac_normalized=True)
+        #ds = eit.solve(v1, v0, normalize=True)
+        #ds_n = sim2pts(pts, tri, np.real(ds))
+        #fig, ax = plt.subplots(figsize=(9,6))
+        #im = ax.tripcolor(x, y, tri, ds_n, shading="flat")
+        #for i, e in enumerate(mesh_obj.el_pos):
+        #    ax.annotate(str(i + 1), xy=(x[e], y[e]), size=12)
+        #ax.plot(x[el_pos], y[el_pos], 'ro')
+        #ax.set_aspect("equal")
+        #fig.colorbar(im)
+        #plt.show()
+
+
+        #GREIT
+        eit = greit.GREIT(mesh_obj, protocol_obj)
+        eit.setup(p=0.20, lamb=0.01, perm=1, jac_normalized=True)
+        ds = eit.solve(v1, v0, normalize=True)
+        x, y, ds = eit.mask_value(ds, mask_value=np.NAN)
+        fig, ax = plt.subplots(figsize=(9,6))
+        im = ax.imshow(np.real(ds), interpolation="none", cmap=plt.cm.viridis)
+        ax.set_aspect("equal")
+        fig.colorbar(im)
+        plt.show()
+
+
+
+
 
 
     def ExitHandler(self):

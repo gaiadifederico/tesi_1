@@ -3,13 +3,19 @@ mille fori con circuito saldato
 
 GUI con bluetooth, mettere tutto sulla prima schermata, far vedere dati ricevuti
 
-calibrare a valle dei MUX
+calibrare a valle dei MUX->fatto
 
-provare altri algoritmi
+provare altri algoritmi-> GREIT su matlab! 
 
-py eit calibrazione differenziale
-eidors togliere rumore 
-filtro prima di immagine
+py eit calibrazione differenziale-->è già così
+
+eidors togliere rumore --> preprocessing immagini
+
+
 cambio contenitore
+
 Deep learning? 9 possibili posizioni (label), è possibile classificare solo con i numeri?
-interpetabilità del segnale?
+
+interpetabilità del segnale? 
+
+

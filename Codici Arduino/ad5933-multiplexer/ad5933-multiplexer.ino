@@ -49,6 +49,7 @@ void setup(void)
   Serial.begin(9600);
   //EN MUX
   digitalWrite(15, HIGH);
+  
   Serial.println("ADJACENT PROTOCOL: 'a' ");
   Serial.println("OPPOSITE PROTOCOL: 'b' ");
   
@@ -59,12 +60,9 @@ void setup(void)
   //select MUX for calibration: current injection 0-4, voltage measurement 1-5
   selectMuxPin_1(0);
   selectMuxPin_2(4);
-  selectMuxPin_3(2);
-  selectMuxPin_4(6);
+  selectMuxPin_3(1);
+  selectMuxPin_4(5);
   delay(1);
-
-
-
   
   // Perform initial configuration. Fail if any one of these fail.
   if (!(AD5933::reset() &&
@@ -72,7 +70,7 @@ void setup(void)
         AD5933::setStartFrequency(START_FREQ) &&
         AD5933::setIncrementFrequency(FREQ_INCR) &&
         AD5933::setNumberIncrements(NUM_INCR) &&
-        AD5933::setPGAGain(PGA_GAIN_X1)))
+        AD5933::setPGAGain(PGA_GAIN_X5)))
         {
             Serial.println("FAILED in initialization!");
             while (true) ;
@@ -83,9 +81,6 @@ void setup(void)
     Serial.println("Calibrated!");
   else
     Serial.println("Calibration failed...");
-
-
-
   
 }
 
@@ -95,7 +90,7 @@ void loop(void)
     switch (Serial.read()) {
       case 'a':
         index=0;
-        //Serial.print("\n--ADJACENT INJECTION PROTOCOL--\n ");
+        //Serial.print("\n---ADJACENT INJECTION PROTOCOL---\n ");
         for(int i=0;i<SIZE;i++){
           selectMuxPin_1(i);
           //Serial.print("Current MUX 1:  ");
@@ -136,7 +131,7 @@ void loop(void)
         break;
       case 'b':
         index=0;
-        Serial.print("\n--OPPOSITE INJECTION PROTOCOL:-- ");
+        //Serial.print("\n---OPPOSITE INJECTION PROTOCOL:--- ");
         for(int i=0;i<SIZE;i++){
           selectMuxPin_1(i);
           //Serial.print("Current MUX 1:  ");
@@ -173,14 +168,15 @@ void loop(void)
           }
         }
         //Serial.print("\n\nEND!!!\n\n\n\n");
-        Serial.print("\nNumero dati acquisiti: ");
-        Serial.println(sizeof(impedance_measurement_opp)/4);
+        //Serial.print("\nNumero dati acquisiti: ");
+        //Serial.println(sizeof(impedance_measurement_opp)/4);
         for (int i=0; i<SIZE*8; i++){
           if(i%2==0){
            Serial.print(impedance_measurement_opp[i]);
            Serial.print(",");
           }
         }
+        Serial.print("\n");
         break;
         
 
@@ -201,6 +197,7 @@ void frequencySweepAdj() {
       int cfreq = START_FREQ/1000;
       for (int i = 0; i < NUM_INCR+1; i++, cfreq += FREQ_INCR/1000) {
         // Print raw frequency data
+        
         /*Serial.print(cfreq);
         Serial.print(": R=");
         Serial.print(real[i]);
@@ -210,8 +207,8 @@ void frequencySweepAdj() {
         // Compute impedance
         double magnitude = sqrt(pow(real[i], 2) + pow(imag[i], 2));
         double impedance = 1/(magnitude*gain[i]);
-        /*Serial.print("\n  |Z|=");
-        Serial.println(impedance);*/
+        //Serial.print("\n  |Z|=");
+        //Serial.println(impedance);
         impedance_measurement_adj[index]=impedance;
         index = index+1;
       }
@@ -235,8 +232,8 @@ void frequencySweepOpp() {
         Serial.print(": R=");
         Serial.print(real[i]);
         Serial.print("/I=");
-        Serial.print(imag[i]);*/
-
+        Serial.print(imag[i]);
+*/
         // Compute impedance
         double magnitude = sqrt(pow(real[i], 2) + pow(imag[i], 2));
         double impedance = 1/(magnitude*gain[i]);

@@ -64,8 +64,8 @@ void setup(void)
   //select MUX for calibration: current injection 0-4, voltage measurement 1-5
   selectMuxPin_1(0);
   selectMuxPin_2(4);
-  selectMuxPin_3(2);
-  selectMuxPin_4(6);
+  selectMuxPin_3(1);
+  selectMuxPin_4(5);
   delay(1);
 
 
@@ -77,7 +77,7 @@ void setup(void)
         AD5933::setStartFrequency(START_FREQ) &&
         AD5933::setIncrementFrequency(FREQ_INCR) &&
         AD5933::setNumberIncrements(NUM_INCR) &&
-        AD5933::setPGAGain(PGA_GAIN_X1)))
+        AD5933::setPGAGain(PGA_GAIN_X5)))
         {
             //Serial.println("FAILED in initialization!");
             while (true) ;
@@ -203,7 +203,9 @@ void frequencySweepAdj() {
         double magnitude = sqrt(pow(real[i], 2) + pow(imag[i], 2));
         binaryFloat impedance;
         impedance.floatingPoint= 1/(magnitude*gain[i]);
-        Serial.write(impedance.binary,4);
+        if(i%2==0){
+          Serial.write(impedance.binary,4);
+        }
       }
     }
 }
@@ -228,7 +230,9 @@ void frequencySweepOpp() {
         double magnitude = sqrt(pow(real[i], 2) + pow(imag[i], 2));
         binaryFloat impedance;
         impedance.floatingPoint= 1/(magnitude*gain[i]);
-        Serial.write(impedance.binary,4);
+        if(i%2==0){
+          Serial.write(impedance.binary,4);
+        }
       }
     }
 }

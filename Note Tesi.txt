@@ -46,3 +46,22 @@ arduino-ad5933 library: missing set excitation range, no calibration phase
 
 Cose da fare: rifare schematico
 portare seriale nella gui
+
+
+
+8129->PA0034
+8132,4817->ARIES LCTQ SOIC 8
+
+buffer
+
+R1 R2 R3=10k R4=1k R5 R6=200k R7=200k R8=1k R9=1k
+Rfb=200k AD5933
+Rref=100
+
+
+
+
+
+
+
+

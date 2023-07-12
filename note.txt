@@ -1,0 +1,12 @@
+offset before amplification
+eliminate offset before amplify
+regulate current
+check datasheet
+build the circuit component by component following datasheet
+
+not AC signal when giving it
+Follow datasheet, forget thesis
+update end of next week
+
+70.000
+seventy thousands

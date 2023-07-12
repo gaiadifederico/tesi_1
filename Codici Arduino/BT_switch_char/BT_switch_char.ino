@@ -27,12 +27,4 @@ void loop() {
     }
 }
 
-/*ISR(USART_RX_vect){
-  char inChar = BTserial.read();
-  BTserial.println("Character received\n");
-  if(inChar=='a'){
-    BTserial.println("Input char: a");
-  }
-  */
-  
 }

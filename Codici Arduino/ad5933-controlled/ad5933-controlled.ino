@@ -8,8 +8,8 @@ ad5933-test
 
 #define START_FREQ  (20000)
 #define FREQ_INCR   (1000)
-#define NUM_INCR    (40)
-#define REF_RESIST  (10000)
+#define NUM_INCR    (70)
+#define REF_RESIST  (1000)
 
 double gain[NUM_INCR+1];
 int phase[NUM_INCR+1];
@@ -80,17 +80,22 @@ void frequencySweepEasy() {
       int cfreq = START_FREQ/1000;
       for (int i = 0; i < NUM_INCR+1; i++, cfreq += FREQ_INCR/1000) {
         // Print raw frequency data
-        Serial.print(cfreq);
+        /*Serial.print(cfreq);
         Serial.print(": R=");
         Serial.print(real[i]);
         Serial.print("/I=");
-        Serial.print(imag[i]);
+        Serial.print(imag[i]);*/
 
         // Compute impedance
         double magnitude = sqrt(pow(real[i], 2) + pow(imag[i], 2));
-        double impedance = 1/(magnitude*gain[i]);
-        Serial.print("  |Z|=");
-        Serial.println(impedance);
+        //double impedance = 1/(magnitude*gain[i]);
+        //double impedance = 1/(magnitude);
+        //Serial.print(",  magnitude=");
+        Serial.print(magnitude, 10);
+        Serial.print(",");
+        //Serial.print("\n");
+        //Serial.print("   |Z|=");
+        //Serial.println(impedance, 10);
       }
       Serial.println("Frequency sweep complete!");
     } else {
@@ -128,9 +133,9 @@ void frequencySweepRaw() {
 
         // Compute impedance
         double magnitude = sqrt(pow(real, 2) + pow(imag, 2));
-        double impedance = 1/(magnitude*gain[i]);
-        Serial.print("  |Z|=");
-        Serial.println(impedance);
+        //double impedance = 1/(magnitude*gain[i]);
+        Serial.print("  |M|=");
+        Serial.println(magnitude);
 
         // Increment the frequency
         i++;
